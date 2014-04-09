@@ -8,7 +8,7 @@
  */
 
 //Use the proper host
-var LOCAL_DEBUG = true; 
+var LOCAL_DEBUG = false; 
 // Connect to the server
 var HOST;
 if (LOCAL_DEBUG) {
