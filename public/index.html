@@ -6,8 +6,10 @@
         <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
         
         <!-- Latest compiled and minified JavaScript -->
-            <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-            <script src="http:////netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>        
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+        <script src="http:////netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>  
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="../js/socket_setup.js"></script>      
 
         <style type="text/css">
             .effort {
@@ -25,7 +27,9 @@
         </style>
 
         <script type="text/javascript">
-        	var team_status; 
+            var teamId = null;
+        	var teamName = null; 
+            var previousAnswer = null;
         	
             $(document).ready(function() {
                 console.log("an image is clicked!");
@@ -35,12 +39,12 @@
                    
                     var src = $(this).attr('src');
                     if (src.toLowerCase().indexOf("illinois") >= 0){
-                    	team_status="illinois"
+                    	teamName="illinois"
                     }
                     else{ 
-                    	team_status="irvine"
+                    	teamName="irvine"
                     }
-                    console.log(team_status);
+                    console.log(teamName);
                     
                     $("#teaminfo").hide();
                     $("#effortsinfo").show();
@@ -50,6 +54,11 @@
                 	console.log("an image of an effort is clicked!");
                     $("*").css("border", "none");
                     $(this).css("border", "2px #f33 solid");
+
+                    var answer = $(this).attr("effortid")       
+                    socket.emit(ClientMessage.QuizAnswer, 
+                        { "Team" : teamName, "Answer" : answer, "PreviousAnswer" : previousAnswer });
+                    previousAnswer = answer;
                 });
 
             });
@@ -63,10 +72,10 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-xs-6">
-                            <img src="../logos/illinois.jpeg" class="team">
+                            <img src="./logos/illinois.jpeg" class="team">
                         </div>
                         <div class="col-xs-6">
-                            <img src="../logos/irvine.jpeg" class="team">
+                            <img src="./logos/irvine.jpeg" class="team">
                         </div>
                     </div>
                 </div>
@@ -78,34 +87,34 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-xs-6">
-                            <img src="../laban_effort_shape/flick-word.jpg" class="effort">
+                            <img src="./laban_effort_shape/flick-word.jpg" class="effort" effortid="0">
                         </div>
                         <div class="col-xs-6 ">
-                            <img src="../laban_effort_shape/dab-word.jpg" class="effort">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-6 ">
-                            <img src="../laban_effort_shape/float-word.jpg" class="effort">
-                        </div>
-                        <div class="col-xs-6 ">
-                            <img src="../laban_effort_shape/glide-word.jpg" class="effort">
+                            <img src="./laban_effort_shape/dab-word.jpg" class="effort" effortid="1">
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-xs-6 ">
-                            <img src="../laban_effort_shape/press-word.jpg" class="effort">
+                            <img src="./laban_effort_shape/float-word.jpg" class="effort" effortid="2">
                         </div>
                         <div class="col-xs-6 ">
-                            <img src="../laban_effort_shape/slash-word.jpg" class="effort">
+                            <img src="./laban_effort_shape/glide-word.jpg" class="effort" effortid="3">
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-xs-6 ">
-                            <img src="../laban_effort_shape/thrust-word.jpg" class="effort">
+                            <img src="./laban_effort_shape/press-word.jpg" class="effort" effortid="4">
                         </div>
                         <div class="col-xs-6 ">
-                            <img src="../laban_effort_shape/wring-word.jpg" class="effort">
+                            <img src="./laban_effort_shape/slash-word.jpg" class="effort" effortid="5">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6 ">
+                            <img src="./laban_effort_shape/thrust-word.jpg" class="effort" effortid="6">
+                        </div>
+                        <div class="col-xs-6 ">
+                            <img src="./laban_effort_shape/wring-word.jpg" class="effort" effortid="7">
                         </div>
                     </div>               
 		    	</div>

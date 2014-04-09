@@ -11,28 +11,26 @@ var express = require('express')
 // State variables
 var ACTIVE_LEVEL = 0
   , CURRENT_QUIZ_ANSWER = 0
-  , SCORE_DELTAS = [0, 0]
+  , SCORE_DELTAS = {"illinois" : 0, "irvine" : 0}
   , HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0]
   , SCORE_CLIENT_SOCKET = null 
 ;
 
 // Message Type Definitions
-var Server = {
-  ActiveLevelMessage : { Event: "activelevel", Level: "level" },  
-  LevelUpMessage : { Event: "levelup", Level: "level" },
-  QuizMessage : { Event: "quiz" }
+var ServerMessage = {
+  ActiveLevel : "activelevel",  
+  LevelUp : "levelup",
+  Quiz : "quiz"
 };
 
-var Client = {
-  QuizAnswerMessage : 
-    { Event : "quizanswer", Team : "team", 
-    Answer : "answer", PreviousAnswer : "prevanswer"}
+var ClientMessage = {
+  QuizAnswer : "quizanswer"
 };
 
-var ScoreClient = {
-  ConnectionMessage : { Event : "scoreconnection" },
-  ScoreDeltasMessage : { Event : "scoredeltas", Deltas : "deltas" },
-  EffortDeltasMessage : { Event : "effortdeltas", Deltas : "deltas" } 
+var ScoreClientMessage = {
+  Connection : "scoreconnection",
+  ScoreDeltas : "scoredeltas",
+  EffortDeltas : "effortdeltas" 
 };
 
 // Used ports and IP addresses
@@ -45,7 +43,7 @@ var HTTP_PORT = 8080
 // Start listening to connections in Debug Mode
 server.listen(HTTP_PORT);
 tcp_server.listen(TCP_PORT);
-io.set('log level', NodeLogLevel.DEBUG);
+io.set('log level', 3);
 
 // Use express to serve statics 
 // Statics are everything in '/res' as well as index.html (in /public)
@@ -67,47 +65,60 @@ function tcp_handler(socket) {
 io.sockets.on('connection', function (socket) {
   console.log('server: established a connection');
   // Notify client of the current level
-  socket.emit(Server.ActiveLevelMessage.Event, 
-    { Server.ActiveLevelMessage.Level : ACTIVE_LEVEL });
+  var message = {};
+
+  socket.emit(ServerMessage.ActiveLevel, 
+    { "Level" : ACTIVE_LEVEL });
 
   // Client Handlers
-  socket.on(Client.QuizAnswerMessage.Event, function(data) {    
-    var fields = Client.QuizAnswerMessage;
-    if (data[fields.Answer] == CURRENT_QUIZ_ANSWER) {
-      SCORE_DELTAS[data[fields.Team]]++;      
+  socket.on(ClientMessage.QuizAnswer, function(data) {  
+    console.log(data);  
+    if (data.Answer == CURRENT_QUIZ_ANSWER) {
+      SCORE_DELTAS[data.Team]++;      
     }
 
-    HISTOGRAM_DELTAS[fields.Answer]++;
-    if (data[fields.PreviousAnswer]) {
-      HISTOGRAM_DELTAS[fields.PreviousAnswer]--;
+    HISTOGRAM_DELTAS[data.Answer]++;
+    if (data.PreviousAnswer) {
+      HISTOGRAM_DELTAS[data.PreviousAnswer]--;
     }
   });
 
   // Score Client Handlers
-  socket.on(ScoreClientMessage.Connection.Event) {
+  socket.on(ScoreClientMessage.Connection, function() {
     console.log("server: score client connected");
     SCORE_CLIENT_SOCKET = socket;
-  };
-
+  });
 
   /* 
     Timer Actions
   */
-  var totalScoreInterval = setInterval(function () {
-    SCORE_CLIENT_SOCKET.emit(ScoreClient.ScoreDeltasMessage.Event, 
-      { ScoreClient.ScoreDeltasMessage.Deltas : SCORE_DELTAS });
-    SCORE_DELTAS = [0, 0];
+  var totalScoreInterval = setInterval(function () {    
+    if (!SCORE_CLIENT_SOCKET) {
+      console.log("score client not found");
+    }
+    else {
+      console.log("score deltas, illinois - " + SCORE_DELTAS["illinois"] + 
+        ", irvine - " + SCORE_DELTAS["irvine"]);
+      SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.ScoreDeltas, 
+        { "Deltas" : SCORE_DELTAS });
+      SCORE_DELTAS = [0, 0];
+    }
   }, 2500);
 
   var histogramInterval = setInterval(function () {
-    SCORE_CLIENT_SOCKET.emit(ScoreClient.HistogramDeltasMessage.Event,
-      { ScoreClient.HistogramDeltasMessage.Deltas : HISTOGRAM_DELTAS });
-    HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];
+    if (!SCORE_CLIENT_SOCKET) {
+      console.log("score client not found");
+    }
+    else {
+      SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.HistogramDeltas,
+        { "Deltas" : HISTOGRAM_DELTAS });
+      HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];
+    }
   }, 2500);
 
   var levelUpInterval = setInterval(function () {
     ACTIVE_LEVEL++;
-    sockets.emit(Client.LevelUpMessage.Event, 
-      { Client.LevelUpMessage.Level : ACTIVE_LEVEL });
+    io.sockets.emit(ClientMessage.LevelUp, 
+      { "Level" : ACTIVE_LEVEL });
   }, 10000);
 });
