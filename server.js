@@ -49,10 +49,12 @@ io.set('log level', NodeLogLevel.DEBUG);
 
 // Use express to serve statics 
 // Statics are everything in '/res' as well as index.html (in /public)
+// /res
+//    /images
+//    /js
+//    /css
 app.configure(function(){
   app.use('/res', express.static(__dirname + '/res'));
-  app.use('/css', express.static(__dirname + '/css'));
-  app.use('/js', express.static(__dirname + '/js'));
   app.use(express.static(__dirname + '/public'));
 })
 
