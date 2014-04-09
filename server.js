@@ -80,7 +80,7 @@ io.sockets.on('connection', function (socket) {
     }
 
     HISTOGRAM_DELTAS[data.Answer]++;
-    if (data.PreviousAnswer) {
+    if (data.PreviousAnswer != null) {
       HISTOGRAM_DELTAS[data.PreviousAnswer]--;
     }
   });

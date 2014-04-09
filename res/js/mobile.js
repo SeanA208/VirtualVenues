@@ -8,13 +8,7 @@ $(document).ready(function() {
     	console.log("an image of a team is clicked!");
         $(this).css("border", "2px #f33 solid");
        
-        var src = $(this).attr('src');
-        if (src.toLowerCase().indexOf("illinois") >= 0){
-        	teamName="illinois"
-        }
-        else{ 
-        	teamName="irvine"
-        }
+        teamName = $(this).attr('team');
         console.log(teamName);
         
         $("#teaminfo").hide();
