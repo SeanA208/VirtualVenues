@@ -1,0 +1,115 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        
+        <!-- Latest compiled and minified JavaScript -->
+            <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+            <script src="http:////netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>        
+
+        <style type="text/css">
+            .effort {
+                width: 125px;
+                height: 125px;
+            }
+            .team {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .row {
+                margin-bottom: 20px;
+            }
+        </style>
+
+        <script type="text/javascript">
+        	var team_status; 
+        	
+            $(document).ready(function() {
+                console.log("an image is clicked!");
+                $(".team").click(function() {
+                	console.log("an image of a team is clicked!");
+                    $(this).css("border", "2px #f33 solid");
+                   
+                    var src = $(this).attr('src');
+                    if (src.toLowerCase().indexOf("illinois") >= 0){
+                    	team_status="illinois"
+                    }
+                    else{ 
+                    	team_status="irvine"
+                    }
+                    console.log(team_status);
+                    
+                    $("#teaminfo").hide();
+                    $("#effortsinfo").show();
+                });
+
+                $(".effort").click(function() {
+                	console.log("an image of an effort is clicked!");
+                    $("*").css("border", "none");
+                    $(this).css("border", "2px #f33 solid");
+                });
+
+            });
+        </script>
+    </head>
+    
+    <body>
+		<div id="content">
+			<div id="teaminfo" align="center" vertical-align="middle">
+                <h1 style="text-align: center;">Pick a team</h1>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <img src="../logos/illinois.jpeg" class="team">
+                        </div>
+                        <div class="col-xs-6">
+                            <img src="../logos/irvine.jpeg" class="team">
+                        </div>
+                    </div>
+                </div>
+                <hr>
+			</div>
+
+			<div id="effortsinfo" align="center" vertical-align="middle" style="display:none">
+                <h1 style="text-align: center;">Pick an effort</h1>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <img src="../laban_effort_shape/flick-word.jpg" class="effort">
+                        </div>
+                        <div class="col-xs-6 ">
+                            <img src="../laban_effort_shape/dab-word.jpg" class="effort">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6 ">
+                            <img src="../laban_effort_shape/float-word.jpg" class="effort">
+                        </div>
+                        <div class="col-xs-6 ">
+                            <img src="../laban_effort_shape/glide-word.jpg" class="effort">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6 ">
+                            <img src="../laban_effort_shape/press-word.jpg" class="effort">
+                        </div>
+                        <div class="col-xs-6 ">
+                            <img src="../laban_effort_shape/slash-word.jpg" class="effort">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6 ">
+                            <img src="../laban_effort_shape/thrust-word.jpg" class="effort">
+                        </div>
+                        <div class="col-xs-6 ">
+                            <img src="../laban_effort_shape/wring-word.jpg" class="effort">
+                        </div>
+                    </div>               
+		    	</div>
+			</div>
+		</div>
+    </body>
+</html>
