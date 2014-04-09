@@ -20,43 +20,41 @@ $(document).ready(function() {
 		HOST = 'ec2-54-83-22-126.compute-1.amazonaws.com';
 	}
 	var socket = io.connect(HOST);
+
+	// Message Type Definitions (copy from server.js)
+	var Server = {
+	  ActiveLevelMessage : { Event: "activelevel", Level: "level" },  
+	  LevelUpMessage : { Event: "levelup", Level: "level" },
+	  QuizMessage : { Event: "quiz" }
+	};
+
+	var Client = {
+	  QuizAnswerMessage : 
+	    { Event : "quizanswer", Team : "team", 
+	    Answer : "answer", PreviousAnswer : "prevanswer"}
+	};
 	
-	// Handle message from server
-	socket.on('news', function (data) {
-		console.log('client: receieved data ' + data.toString());
-	});
-		
-	// Start countdown
-	socket.on('start-countdown', function (data) {
-		console.log('client: start countdown');
-		showCountdown(data.ticks);
+	// State Variables
+	var ACTIVE_LEVEL = 0;
+
+	/* 
+		Handlers
+	*/
+	socket.on(Server.ActiveLevelMessage.Event, function (data) {
+		console.log('client: active level message');
+		ACTIVE_LEVEL = data[Server.ActiveLevelMessage.Level];
 	});
 
-	// Show and play the video
-	socket.on('play-video', function (data) {
-		console.log('client: play video');	
-		showVideo();
+	socket.on(Server.LevelUpMessage.Event, function (data) {
+		console.log('client: level up message');
+		ACTIVE_LEVEL = data[Server.LevelUpMessage.Level];
+		// May want to do some checks here
 	});
 
-	// Pause the video
-	socket.on('stop-video', function (data) {
-	 	console.log('client: stop video');
-	 	video.pause(); 
+	socket.on(Server.QuizMessage.Event, function (data) {
+		console.log('client: quiz message');
+		// TODO
 	});
-	
-	// Handle the interrup message from Max
-	socket.on('start-interrupt-pattern', function (data) {
-		console.log('client: start interrupt pattern');
-		changeVideoSource("res/test_pattern");
-		showVideo();;
-		bindVideoEnded(function() {
-			showCountdown(data.ticks, function() {
-				changeVideoSource("res/videoE");
-				showVideo();
-				bindVideoEnded(function() {
-					startColorMode();
-				});
-			});	
-		});	
-	});
+
+	// TODO: send QuizAnswerMessage on effort click
 });

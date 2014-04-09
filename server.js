@@ -17,20 +17,22 @@ var ACTIVE_LEVEL = 0
 ;
 
 // Message Type Definitions
-var ServerMessage = {
-  ACTIVE_LEVEL : "activelevel",  
-  LEVEL_UP : "levelup",
-  QUIZ : "quiz"
+var Server = {
+  ActiveLevelMessage : { Event: "activelevel", Level: "level" },  
+  LevelUpMessage : { Event: "levelup", Level: "level" },
+  QuizMessage : { Event: "quiz" }
 };
 
-var ClientMessage = {
-  QUIZ_ANSWER : "quizanswer"
+var Client = {
+  QuizAnswerMessage : 
+    { Event : "quizanswer", Team : "team", 
+    Answer : "answer", PreviousAnswer : "prevanswer"}
 };
 
-var ScoreClientMessage = {
-  CONNECTION : "scoreconnection",
-  SCORE_DELTA : "scoredelta",
-  EFFORT_DELTA : "effortdelta"
+var ScoreClient = {
+  ConnectionMessage : { Event : "scoreconnection" },
+  ScoreDeltasMessage : { Event : "scoredeltas", Deltas : "deltas" },
+  EffortDeltasMessage : { Event : "effortdeltas", Deltas : "deltas" } 
 };
 
 // Used ports and IP addresses
@@ -65,39 +67,47 @@ function tcp_handler(socket) {
 io.sockets.on('connection', function (socket) {
   console.log('server: established a connection');
   // Notify client of the current level
-  socket.emit(ServerMessage.ACTIVE_LEVEL, 
-    {"activeLevel" : ACTIVE_LEVEL});
+  socket.emit(Server.ActiveLevelMessage.Event, 
+    { Server.ActiveLevelMessage.Level : ACTIVE_LEVEL });
 
   // Client Handlers
-  socket.on(ClientMessage.QUIZ_ANSWER, function(data) {    
-    if (data.answer == CURRENT_QUIZ_ANSWER) {
-      SCORE_DELTAS[data.team]++;      
+  socket.on(Client.QuizAnswerMessage.Event, function(data) {    
+    var fields = Client.QuizAnswerMessage;
+    if (data[fields.Answer] == CURRENT_QUIZ_ANSWER) {
+      SCORE_DELTAS[data[fields.Team]]++;      
     }
 
-    HISTOGRAM_DELTAS[data.answer]++;
-    if (data.prevAnswer) {
-      HISTOGRAM_DELTAS[data.prevAnswer]--;
+    HISTOGRAM_DELTAS[fields.Answer]++;
+    if (data[fields.PreviousAnswer]) {
+      HISTOGRAM_DELTAS[fields.PreviousAnswer]--;
     }
   });
 
   // Score Client Handlers
-  socket.on(ScoreClientMessage.CONNECTION) {
+  socket.on(ScoreClientMessage.Connection.Event) {
     console.log("server: score client connected");
     SCORE_CLIENT_SOCKET = socket;
   };
 
-  
+
+  /* 
+    Timer Actions
+  */
+  var totalScoreInterval = setInterval(function () {
+    SCORE_CLIENT_SOCKET.emit(ScoreClient.ScoreDeltasMessage.Event, 
+      { ScoreClient.ScoreDeltasMessage.Deltas : SCORE_DELTAS });
+    SCORE_DELTAS = [0, 0];
+  }, 2500);
+
+  var histogramInterval = setInterval(function () {
+    SCORE_CLIENT_SOCKET.emit(ScoreClient.HistogramDeltasMessage.Event,
+      { ScoreClient.HistogramDeltasMessage.Deltas : HISTOGRAM_DELTAS });
+    HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];
+  }, 2500);
+
+  var levelUpInterval = setInterval(function () {
+    ACTIVE_LEVEL++;
+    sockets.emit(Client.LevelUpMessage.Event, 
+      { Client.LevelUpMessage.Level : ACTIVE_LEVEL });
+  }, 10000);
 });
-
-// Timer Actions
-var totalScoreInterval = setInterval(function () {
-  SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.SCORE_DELTA, 
-    SCORE_DELTAS);
-  SCORE_DELTAS = [0, 0];
-}, 2500);
-
-var histogramInterval = setInterval(function () {
-  SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.HISTOGRAM_DELTAS,
-      HISTOGRAM_DELTAS);
-  HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];
-}, 2500);
