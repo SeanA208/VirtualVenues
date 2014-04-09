@@ -94,8 +94,8 @@
 				for (var team in data.Deltas) {
 					SCORES[team] += data.Deltas[team];
 				}
-				$('illinois-score').text(SCORES['illinois']);
-				$('irvine-score').text(SCORES['irvine']);
+				$('#illinois-score').text(SCORES['illinois']);
+				$('#irvine-score').text(SCORES['irvine']);
 			});	
 
 			socket.on(ScoreClientMessage.HistogramDeltas, function (data) {

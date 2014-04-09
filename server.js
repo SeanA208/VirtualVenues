@@ -76,7 +76,7 @@ io.sockets.on('connection', function (socket) {
   socket.on(ClientMessage.QuizAnswer, function(data) {  
     console.log('server: quiz answer');
     console.log(data);  
-    if (data.Answer == CURRENT_QUIZ_ANSWER) {
+    if (data.Answer === CURRENT_QUIZ_ANSWER) {
       SCORE_DELTAS[data.Team] += 1;      
     }
 
@@ -103,8 +103,8 @@ io.sockets.on('connection', function (socket) {
       // console.log("score client not found");
     }
     else {
-      // console.log("score deltas, illinois - " + SCORE_DELTAS["illinois"] + 
-      //   ", irvine - " + SCORE_DELTAS["irvine"]);
+      console.log("score deltas, illinois - " + SCORE_DELTAS["illinois"] + 
+        ", irvine - " + SCORE_DELTAS["irvine"]);
       SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.ScoreDeltas, 
         { "Deltas" : SCORE_DELTAS });
       SCORE_DELTAS = {"illinois" : 0, "irvine" : 0};
