@@ -4,13 +4,50 @@
 </head>
 
 <body>
+	<div id="illinois-score">
+
+	</div>
+	<div id="irvine-score">
+
+	</div>
+
 	<div id="graphDiv1"></div>
 	<!--[if IE]><script src="excanvas.js"></script><![endif]-->
-	<script src="../js/barGraph.js"></script>
-	<script>
-	
-		function createCanvas(divName) {
-			
+	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+	<script src="../res/js/barGraph.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+
+	<script>	
+		var LOCAL_DEBUG = true; 
+		// Connect to the server
+		var HOST;
+		if (LOCAL_DEBUG) {
+			HOST = 'localhost';
+		}
+		else {
+			HOST = 'ec2-54-83-22-126.compute-1.amazonaws.com';
+		}
+		var socket = io.connect(HOST);
+
+		// Message Type Definitions
+		var ServerMessage = {
+		  ActiveLevel : "activelevel",  
+		  LevelUp : "levelup",
+		  Quiz : "quiz"
+		};
+
+		var ScoreClientMessage = {
+		  Connection : "scoreconnection",
+		  ScoreDeltas : "scoredeltas",
+		  EffortDeltas : "effortdeltas" 
+		};
+
+		// State Variables
+		var ACTIVE_LEVEL = 0;
+		var SCORES = {"illinois" : 0, "irvine" : 0};
+		var EFFORT_SCORES = [0, 0, 0, 0, 0, 0, 0, 0];
+
+		function createCanvas(divName) {			
 			var div = document.getElementById(divName);
 			var canvas = document.createElement('canvas');
 			div.appendChild(canvas);
@@ -20,19 +57,64 @@
 			var ctx = canvas.getContext("2d");
 			return ctx;
 		}
-		
-		var ctx = createCanvas("graphDiv1");
-		
-		var graph = new BarGraph(ctx);
-		graph.width = screen.availWidth;
-		graph.height = screen.availHeight;
-		graph.maxValue = 30;
-		graph.margin = 20;
-		graph.colors = ["#49a0d8", "#d353a0", "#ffc527", "#df4c27"];
-		graph.xAxisLabelArr = ["UofI", "Irvine"];
-		setInterval(function () {
-			graph.update([Math.random() * 30, Math.random() * 30]);
-		}, 1000);
+
+		$(document).ready(function() {
+			var ctx = createCanvas("graphDiv1");
+			
+			var graph = new BarGraph(ctx);
+			graph.width = screen.availWidth;
+			graph.height = screen.availHeight;
+			graph.maxValue = 50;
+			graph.margin = 2;
+			graph.colors = ["#49a0d8", "#d353a0", "#ffc527", "#df4c27"];
+			// Effort order taken from index.html
+			graph.xAxisLabelArr = 
+				["Flick", "Dab", "Float", "Glide", "Press", "Slash", "Thrust", "Wring"];
+			graph.update([0, 0, 0, 0, 0, 0, 0, 0]);
+
+			// Notify the server you're the scoreboard
+			socket.emit(ScoreClientMessage.Connection);
+
+			socket.on(ServerMessage.ActiveLevel, function (data) {
+				console.log('scoreboard: active level message');
+				ACTIVE_LEVEL = data.Level;
+			});
+
+			socket.on(ServerMessage.LevelUp, function (data) {
+				console.log('scoreboard: level up message');
+				ACTIVE_LEVEL = data.Level;
+				// May want to do some checks here
+			});
+
+			socket.on(ScoreClientMessage.ScoreDeltas, function (data) {
+				console.log('scoreboard: score deltas message');
+				console.log(data.Deltas);
+				for (var team in data.Deltas) {
+					SCORES[team] += data.Deltas[team];
+				}
+			});	
+
+			socket.on(ScoreClientMessage.HistogramDeltas, function (data) {
+				console.log('scoreboard: histogram deltas message');
+				console.log(data.Deltas);
+
+				if (!data.Deltas || !data.Deltas.length) {
+					return;
+				}
+				else {
+					for (var i = 0; i < data.Deltas.length; i += 1) {
+						EFFORT_SCORES[i] += data.Deltas[i];
+					}
+					console.log("new histogram values");
+					console.log(EFFORT_SCORES);
+					graph.update(EFFORT_SCORES);
+				}
+			});
+		});	
+
+		// setInterval(function () {
+		// 	graph.update([Math.random() * 30, Math.random() * 30]);
+		// }, 1000);
 
 	</script>
 </body>

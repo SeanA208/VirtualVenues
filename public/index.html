@@ -29,10 +29,9 @@
         <script type="text/javascript">
             var teamId = null;
         	var teamName = null; 
-            var previousAnswer = null;
+            var previousAnswer = -1;
         	
             $(document).ready(function() {
-                console.log("an image is clicked!");
                 $(".team").click(function() {
                 	console.log("an image of a team is clicked!");
                     $(this).css("border", "2px #f33 solid");
@@ -55,7 +54,7 @@
                     $("*").css("border", "none");
                     $(this).css("border", "2px #f33 solid");
 
-                    var answer = $(this).attr("effortid")       
+                    var answer = parseInt($(this).attr("effortid"));       
                     socket.emit(ClientMessage.QuizAnswer, 
                         { "Team" : teamName, "Answer" : answer, "PreviousAnswer" : previousAnswer });
                     previousAnswer = answer;
