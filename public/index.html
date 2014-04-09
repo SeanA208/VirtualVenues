@@ -9,7 +9,8 @@
         <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
         <script src="http:////netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>  
         <script src="/socket.io/socket.io.js"></script>
-        <script src="../res/js/socket_setup.js"></script>      
+        <script src="/res/js/mobile.js"></script>
+        <script src="/res/js/socket_setup.js"></script>      
 
         <style type="text/css">
             .effort {
@@ -24,44 +25,7 @@
             .row {
                 margin-bottom: 20px;
             }
-        </style>
-
-        <script type="text/javascript">
-            var teamId = null;
-        	var teamName = null; 
-            var previousAnswer = -1;
-        	
-            $(document).ready(function() {
-                $(".team").click(function() {
-                	console.log("an image of a team is clicked!");
-                    $(this).css("border", "2px #f33 solid");
-                   
-                    var src = $(this).attr('src');
-                    if (src.toLowerCase().indexOf("illinois") >= 0){
-                    	teamName="illinois"
-                    }
-                    else{ 
-                    	teamName="irvine"
-                    }
-                    console.log(teamName);
-                    
-                    $("#teaminfo").hide();
-                    $("#effortsinfo").show();
-                });
-
-                $(".effort").click(function() {
-                	console.log("an image of an effort is clicked!");
-                    $("*").css("border", "none");
-                    $(this).css("border", "2px #f33 solid");
-
-                    var answer = parseInt($(this).attr("effortid"));       
-                    socket.emit(ClientMessage.QuizAnswer, 
-                        { "Team" : teamName, "Answer" : answer, "PreviousAnswer" : previousAnswer });
-                    previousAnswer = answer;
-                });
-
-            });
-        </script>
+        </style>        
     </head>
     
     <body>
@@ -71,10 +35,10 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-xs-6">
-                            <img src="/res/images/logos/illinois.jpeg" class="team">
+                            <img src="/res/images/logos/illinois.jpeg" class="team" team="illinois">
                         </div>
                         <div class="col-xs-6">
-                            <img src="/res/images/logos/irvine.jpeg" class="team">
+                            <img src="/res/images/logos/irvine.jpeg" class="team" team="irvine">
                         </div>
                     </div>
                 </div>

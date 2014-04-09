@@ -4,11 +4,13 @@
 </head>
 
 <body>
-	<div id="illinois-score">
-
+	<div id="illinois">
+		<div>Illinois</div>
+		<div id="illinois-score">0</div>
 	</div>
-	<div id="irvine-score">
-
+	<div id="irvine">
+		<div>Irvine</div>
+		<div id="irvine-score">0</div>
 	</div>
 
 	<div id="graphDiv1"></div>
@@ -62,9 +64,9 @@
 			var ctx = createCanvas("graphDiv1");
 			
 			var graph = new BarGraph(ctx);
-			graph.width = screen.availWidth;
-			graph.height = screen.availHeight;
-			graph.maxValue = 50;
+			graph.width = screen.availWidth / 2;
+			graph.height = screen.availHeight / 2;
+			graph.maxValue = 10;
 			graph.margin = 2;
 			graph.colors = ["#49a0d8", "#d353a0", "#ffc527", "#df4c27"];
 			// Effort order taken from index.html
@@ -92,6 +94,8 @@
 				for (var team in data.Deltas) {
 					SCORES[team] += data.Deltas[team];
 				}
+				$('illinois-score').text(SCORES['illinois']);
+				$('irvine-score').text(SCORES['irvine']);
 			});	
 
 			socket.on(ScoreClientMessage.HistogramDeltas, function (data) {
