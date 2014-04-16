@@ -3,12 +3,21 @@ var previousAnswer = null;
 
 $(document).ready(function() {
     console.log("an image is clicked!");
+
+    if (getCookieValue('team') != false) {
+        teamName = getCookieValue('team');
+        console.log("Previous Value:"+teamName);
+        $("#teaminfo").hide();
+        $("#effortsinfo").show();
+    }
+
     $(".team").click(function() {
     	console.log("an image of a team is clicked!");
         $(this).css("border", "2px #f33 solid");
        
         teamName = $(this).attr('team');
         console.log(teamName);
+        writeSessionCookie('team',teamName);
         
         $("#teaminfo").hide();
         $("#effortsinfo").show();
