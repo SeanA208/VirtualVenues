@@ -1,100 +1,48 @@
-// Connect to the server
-var LOCAL_DEBUG = false; 
-var HOST = LOCAL_DEBUG ? 
-	'localhost' : 
-	'ec2-54-83-22-126.compute-1.amazonaws.com';
-var socket = io.connect(HOST);
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
-// Message Type Definitions
-var ServerMessage = {
-	ActiveLevel : "activelevel",  
-	LevelUp : "levelup",
-	Quiz : "quiz"
-};
+<html lang="en">
 
-var ScoreClientMessage = {
-	Connection : "scoreconnection",
-	ScoreDeltas : "scoredeltas",
-	EffortDeltas : "effortdeltas" 
-};
+<head>
+	<title>Kaleidoscope</title>
+	<meta http-equiv="content-type" content="text/html;charset=ISO-8859-1">
+	<meta http-equiv="content-language" content="en">
+	<meta name="description" content="Test">
+	<meta name="keywords" content="iphone,ipod touch,ipod,touch,apple webapps,apple,webapps,graphic,design,visual,effect,animation,particle,code,javascript,canvas">
+	<meta name="author" content="REZ">
+	<meta name="generator" content="REZ">
+	<meta name="version" content="0.4">
+	<meta name="copyright" content="REZ 2008">
+	<meta name="robots" content="all">
+	<meta name="viewport" content="width=device-width,user-scalable=0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
 
-// State Variables
-var ACTIVE_LEVEL = 0;
-var SCORES = {"illinois" : 0, "irvine" : 0};
-var EFFORT_SCORES = [0, 0, 0, 0, 0, 0, 0, 0];
-var CURRENT_TEAM = "illinois";
+	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+	<script src="http:////netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>  
+	<script src="../res/js/barGraph.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
 
-$(document).ready(function() {
-	var ctx = $("#bar_canvas")[0].getContext("2d");
-	
-	var graph = new BarGraph(ctx);
-	graph.width = screen.availWidth / 2;
-	graph.height = 450;
-	graph.maxValue = 20;
-	graph.margin = 2;
-	graph.colors = ["green", "red", "blue", "yellow"];
+	<!-- Our Scripts -->
+	<script src="../res/js/scoreboard_setup.js"></script>
+	<!-- End: Our Scripts -->
 
-	// Effort order taken from index.html
-	graph.xAxisLabelArr = 
-		["Flick", "Dab", "Float", "Glide", "Press", "Slash", "Thrust", "Wring"];
-	graph.update([0, 0, 0, 0, 0, 0, 0, 0]);
-
-	$("#bar_canvas").css(
-		"color", "white", 
-		"background-color", "black"
-	);
-
-	// Notify the server you're the scoreboard
-	socket.emit(ScoreClientMessage.Connection);
-
-	socket.on(ServerMessage.ActiveLevel, function (data) {
-		console.log('scoreboard: active level message');
-		ACTIVE_LEVEL = data.Level;
-	});
-
-	socket.on(ServerMessage.LevelUp, function (data) {
-		console.log('scoreboard: level up message');
-		ACTIVE_LEVEL = data.Level;
-		// May want to do some checks here
-	});
-
-	socket.on(ScoreClientMessage.ScoreDeltas, function (data) {
-		console.log('scoreboard: score deltas message');
-		console.log(data.Deltas);
-		for (var team in data.Deltas) {
-			SCORES[team] += data.Deltas[team];
+	<style type="text/css">
+		body {
+			margin:0; padding:0; background-color:#000000;
+			-webkit-text-size-adjust:none; overflow:hidden
 		}
-		var animationUpdates = 0;
-		var resetLoop = setInterval(function() {
-			if (animationUpdates >= SCORES[CURRENT_TEAM]) {
-				clearInterval(resetLoop);
-			}
-			reset();
-			animationUpdates += 1;
-		}, 500);
-		$('#illinois-score').text(SCORES['illinois']);
-		$('#irvine-score').text(SCORES['irvine']);
-	});	
-
-	socket.on(ScoreClientMessage.HistogramDeltas, function (data) {
-		console.log('scoreboard: histogram deltas message');
-		console.log(data.Deltas);
-
-		if (!data.Deltas || !data.Deltas.length) {
-			return;
+		/*
+		div {
+			margin:0;padding:0;position:absolute;font-size:0;overflow:hidden
 		}
-		else {
-			var NEW_SCORES = [0, 0, 0, 0, 0, 0, 0, 0]
-			for (var i = 0; i < data.Deltas.length; i += 1) {
-				EFFORT_SCORES[i] += data.Deltas[i];
-				NEW_SCORES[i] = (EFFORT_SCORES[i] < 0 ? 0 : EFFORT_SCORES[i]);
-			}
-			console.log("new histogram values");
-			graph.update(NEW_SCORES);
+		*/
+		canvas {
+			background-color:#000000;
+			overflow:hidden
 		}
-	});
-});	
+	</style>
 
+</head>
+
+<script type="text/javascript">
 	function $i(id) { return document.getElementById(id); }
 	function $c(code) { return String.fromCharCode(code); }
 
@@ -284,3 +232,30 @@ $(document).ready(function() {
 			}
 		top.status='$'+key+'='+$c(key);
 	}
+</script>
+
+<body onload="resize()">
+    <!-- Effort Graph -->
+	<div id="graph" align="center" vertical-align="middle" style="position:absolute; left:25%; top:40%;">
+		<canvas id="bar_canvas" style="background-color:#000"></canvas>
+	</div>
+	<!-- End: Effort Graph -->
+
+	<!-- Animation Element -->
+	<div id="screen" style="background-color:#000000; display:none;">
+		<canvas id="shadebob"></canvas>
+	</div>
+	<!-- End: Animation Element -->
+
+	<!-- Scores (must be last to overlay any graphics)-->
+    <div id="illinois-score-container" style="position:fixed; left:25px; top:10px;">
+        <img src="/res/images/logos/illinois_black_scaled.jpg" class="team" team="illinois">
+       	<h2 id="illinois-score" align="center" style="color:white;">0</h2>
+    </div>
+    <div id="irvine-score-container" style="position:fixed; right:25px; top:10px;">
+        <img src="/res/images/logos/irvine_black_scaled.jpg" class="team" team="irvine">          
+        <h2 id="irvine-score" align="center" style="color:#ffba22;">0</h2>
+    </div>
+    <!-- End: Scores -->
+</body>
+</html>
