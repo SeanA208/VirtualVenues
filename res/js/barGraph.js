@@ -74,8 +74,8 @@ function BarGraph(ctx) {
 	  }
 				
 	  // Draw the background color
-	  // ctx.fillStyle = that.backgroundColor;
-	  // ctx.fillRect(0, 0, that.width, that.height);
+	  ctx.fillStyle = that.backgroundColor;
+	  ctx.fillRect(0, 0, that.width, that.height);
 					
 	  // If x axis labels exist then make room	
 	  if (that.xAxisLabelArr.length) {
