@@ -109,10 +109,10 @@ function BarGraph(ctx) {
 		ctx.shadowOffsetX = 2;
 		ctx.shadowOffsetY = 2;
 		ctx.shadowBlur = 2;
-		ctx.shadowColor = "#999";
+		ctx.shadowColor = "#333";
 						
 		// Draw bar background
-		ctx.fillStyle = "#333";			
+		ctx.fillStyle = "#000";			
 		ctx.fillRect(that.margin + i * that.width / numOfBars,
 		  graphAreaHeight - barHeight,
 		  barWidth,
@@ -139,19 +139,19 @@ function BarGraph(ctx) {
 		}
 
 		// Write bar value
-		ctx.fillStyle = "#333";
+		ctx.fillStyle = "#eee";
 		ctx.font = "bold 20px sans-serif";
 		ctx.textAlign = "center";
 		// Use try / catch to stop IE 8 from going to error town
 		try {
-		  ctx.fillText(parseInt(arr[i],10),
+		  ctx.fillText(Math.round(arr[i]),
 			i * that.width / numOfBars + (that.width / numOfBars) / 2,
 			graphAreaHeight - barHeight - 10);
 		} catch (ex) {}
 		// Draw bar label if it exists
 		if (that.xAxisLabelArr[i]) {					
 		  // Use try / catch to stop IE 8 from going to error town				
-		  ctx.fillStyle = "#333";
+		  ctx.fillStyle = "#bbb";
 		  ctx.font = "bold 20px sans-serif";
 		  ctx.textAlign = "center";
 		  try{
@@ -171,7 +171,7 @@ function BarGraph(ctx) {
   this.margin = 5;
   this.colors = ["purple", "red", "green", "yellow"];
   this.curArr = [];
-  this.backgroundColor = "#fff";
+  this.backgroundColor = "#000";
   this.xAxisLabelArr = [];
   this.yAxisLabelArr = [];
   this.animationInterval = 100;
