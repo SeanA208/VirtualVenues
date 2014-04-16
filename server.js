@@ -43,7 +43,7 @@ var HTTP_PORT = 8080
 // Start listening to connections in Debug Mode
 server.listen(HTTP_PORT);
 tcp_server.listen(TCP_PORT);
-io.set('log level', 1);
+io.set('log level', 2);
 
 // Use express to serve statics 
 // Statics are everything in '/res' as well as index.html (in /public)
@@ -94,37 +94,37 @@ io.sockets.on('connection', function (socket) {
     console.log("server: score client connected");
     SCORE_CLIENT_SOCKET = socket;
   });
-
-  /* 
-    Timer Actions
-  */
-  var totalScoreInterval = setInterval(function () {    
-    if (!SCORE_CLIENT_SOCKET) {
-      // console.log("score client not found");
-    }
-    else {
-      console.log("score deltas, illinois - " + SCORE_DELTAS["illinois"] + 
-        ", irvine - " + SCORE_DELTAS["irvine"]);
-      SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.ScoreDeltas, 
-        { "Deltas" : SCORE_DELTAS });
-      SCORE_DELTAS = {"illinois" : 0, "irvine" : 0};
-    }
-  }, 5000);
-
-  var histogramInterval = setInterval(function () {
-    if (!SCORE_CLIENT_SOCKET) {
-      // console.log("score client not found");
-    }
-    else {
-      SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.HistogramDeltas,
-        { "Deltas" : HISTOGRAM_DELTAS });
-      HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];
-    }
-  }, 5000);
-
-  var levelUpInterval = setInterval(function () {
-    ACTIVE_LEVEL++;
-    io.sockets.emit(ClientMessage.LevelUp, 
-      { "Level" : ACTIVE_LEVEL });
-  }, 30000);
 });
+
+/* 
+  Timer Actions
+*/
+var totalScoreInterval = setInterval(function () {    
+  if (!SCORE_CLIENT_SOCKET) {
+    // console.log("score client not found");
+  }
+  else {
+    console.log("score deltas, illinois - " + SCORE_DELTAS["illinois"] + 
+      ", irvine - " + SCORE_DELTAS["irvine"]);
+    SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.ScoreDeltas, 
+      { "Deltas" : SCORE_DELTAS });
+    SCORE_DELTAS = {"illinois" : 0, "irvine" : 0};
+  }
+}, 5000);
+
+var histogramInterval = setInterval(function () {
+  if (!SCORE_CLIENT_SOCKET) {
+    // console.log("score client not found");
+  }
+  else {
+    SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.HistogramDeltas,
+      { "Deltas" : HISTOGRAM_DELTAS });
+    HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];
+  }
+}, 5000);
+
+var levelUpInterval = setInterval(function () {
+  ACTIVE_LEVEL++;
+  io.sockets.emit(ClientMessage.LevelUp, 
+    { "Level" : ACTIVE_LEVEL });
+}, 30000);

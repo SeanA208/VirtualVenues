@@ -8,15 +8,10 @@
  */
 
 //Use the proper host
-var LOCAL_DEBUG = false; 
-// Connect to the server
-var HOST;
-if (LOCAL_DEBUG) {
-	HOST = 'localhost';
-}
-else {
-	HOST = 'ec2-54-83-22-126.compute-1.amazonaws.com';
-}
+var LOCAL_DEBUG = true; 
+var HOST =  LOCAL_DEBUG ?
+	'localhost' :
+	'ec2-54-83-22-126.compute-1.amazonaws.com';
 var socket = io.connect(HOST);
 
 // Message Type Definitions (copy from server.js)
@@ -51,5 +46,3 @@ socket.on(ServerMessage.Quiz, function (data) {
 	console.log('client: quiz message');
 	// TODO
 });
-
-// TODO: send QuizAnswerMessage on effort click
