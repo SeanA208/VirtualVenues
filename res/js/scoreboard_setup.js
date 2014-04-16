@@ -29,8 +29,8 @@ $(document).ready(function() {
 	
 	var graph = new BarGraph(ctx);
 	graph.width = screen.availWidth / 2;
-	graph.height = screen.availHeight / 2;
-	graph.maxValue = 10;
+	graph.height = 450;
+	graph.maxValue = 20;
 	graph.margin = 2;
 	graph.colors = ["#49a0d8", "#d353a0", "#ffc527", "#df4c27"];
 
