@@ -131,6 +131,7 @@ $(document).ready(function() {
 
 	document.onkeypress=key_manager;
 
+
 	function init()	{
 		var screen=$i('screen');
 		screen.style.display='block';
@@ -264,7 +265,7 @@ $(document).ready(function() {
 
 	function resize() {	
 		canvas_w=get_screen_size()[0];
-		canvas_h=get_screen_size()[1] - 200;
+		canvas_h=get_screen_size()[1];
 		init();
 	}	
 
