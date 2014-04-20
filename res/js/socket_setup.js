@@ -16,8 +16,7 @@ var socket = io.connect(HOST);
 
 // Message Type Definitions (copy from server.js)
 var ServerMessage = {
-  ActiveLevel : "activelevel",  
-  LevelUp : "levelup",
+  LevelSetting : "levelsetting",
   Quiz : "quiz"
 };
 
@@ -26,23 +25,19 @@ var ClientMessage = {
 };
 
 // State Variables
-var ACTIVE_LEVEL = 0;
+var ACTIVE_LEVEL = null;
+var LEVEL_SETTING = null;
 
 /* 
 	Handlers
 */
-socket.on(ServerMessage.ActiveLevel, function (data) {
-	console.log('client: active level message');
-	ACTIVE_LEVEL = data.Level;
-});
-
-socket.on(ServerMessage.LevelUp, function (data) {
+socket.on(ServerMessage.LevelSetting, function (data) {
 	console.log('client: level up message');
 	ACTIVE_LEVEL = data.Level;
-	// May want to do some checks here
+	LEVEL_SETTING = data.Setting;
+	changeLevelSetting(LEVEL_SETTING);
 });
 
 socket.on(ServerMessage.Quiz, function (data) {
 	console.log('client: quiz message');
-	// TODO
 });

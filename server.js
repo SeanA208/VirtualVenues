@@ -9,17 +9,32 @@ var express = require('express')
 ;
 
 // State variables
-var ACTIVE_LEVEL = 0
-  , CURRENT_QUIZ_ANSWER = 0
-  , SCORE_DELTAS = {"illinois" : 0, "irvine" : 0}
-  , HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0]
-  , SCORE_CLIENT_SOCKET = null 
-;
+var SCORE_DELTAS = {"illinois" : 0, "irvine" : 0};
+var HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];
+var SCORE_CLIENT_SOCKET = null;
+var ACTIVE_LEVEL = 0;
+var LEVEL_SETTING = {
+  "TotalDancers" : 2,
+  "EffortsPerDancer" : 1,
+  "DancerEfforts" : { 
+    0 : [0], 
+    1 : [2]}
+};
+
+// TEST
+// Hard coded settings per level
+var LEVEL_SETTINGS = {
+  0 : {"TotalDancers" : 2, "EffortsPerDancer" : 1, 
+    "DancerEfforts" : {0 : [0], 2 : [2]}},
+  1 : {"TotalDancers" : 3, " EffortsPerDancer" : 2, 
+    "DancerEfforts" : {0 : [6, 7], 1 : [2, 3], 2: [1, 2]}},
+  2 : {"TotalDancers" : 4, "EfforsPerDancer" : 2,
+    "DancerEfforts" : {0 : [0, 1], 1 : [2, 3], 2 : [4, 5], 3 : [6,7]}}
+}
 
 // Message Type Definitions
-var ServerMessage = {
-  ActiveLevel : "activelevel",  
-  LevelUp : "levelup",
+var ServerMessage = { 
+  LevelSetting : "levelsetting",
   Quiz : "quiz"
 };
 
@@ -61,23 +76,54 @@ function tcp_handler(socket) {
   console.log('tcp handler: request received');
 };
 
+
+// Calculates correct quiz answer matches
+// NOTE: Doesn't consider previous answer yet
+function getScoreChange(message) {
+  var count = 0;
+  if (message && message.Answer) {
+    // If Server and Client levels are the same
+    if (message.Answer.Level == ACTIVE_LEVEL) {
+      // Loop through each dancer
+      for (var dancerId in message.Answer.DancerEfforts) {
+        // Check if the dancer is actually dancing this level
+        if (dancerId in LEVEL_SETTING["DancerEfforts"]) {
+          // Check if the effort guess is correct
+          for (var effortId in message.Answer.DancerEfforts[dancerId]) {
+            for (var correctEffortId in LEVEL_SETTING["DancerEfforts"][dancerId]) {
+              if (effortId === correctEffortId) {
+                count += 1;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return count;
+};
+
 /* 
   Handle client events
 */
 io.sockets.on('connection', function (socket) {
   console.log('server: established a connection');
-  // Notify client of the current level
-  var message = {};
 
-  socket.emit(ServerMessage.ActiveLevel, 
-    { "Level" : ACTIVE_LEVEL });
+  // Notify client of the current level
+  socket.emit(ServerMessage.LevelSetting, {
+    "Level" : ACTIVE_LEVEL,
+    "Setting" : LEVEL_SETTING
+  });
 
   // Client Handlers
   socket.on(ClientMessage.QuizAnswer, function(data) {  
     console.log('server: quiz answer');
     console.log(data);  
-    if (data.Answer === CURRENT_QUIZ_ANSWER) {
-      SCORE_DELTAS[data.Team] += 1;      
+    var scoreChange = getScoreChange(data);
+    if (scoreChange !== 0) {
+      SCORE_DELTAS[data.Team] += scoreChange;   
+      SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.ScoreDeltas, 
+        { "Deltas" : SCORE_DELTAS });   
     }
 
     HISTOGRAM_DELTAS[data.Answer] += 1;
@@ -104,22 +150,25 @@ io.sockets.on('connection', function (socket) {
 /* 
   Timer Actions
 */
-var totalScoreInterval = setInterval(function () {    
-  if (!SCORE_CLIENT_SOCKET) {
-    // console.log("score client not found");
-  }
-  else {
-    console.log("score deltas, illinois - " + SCORE_DELTAS["illinois"] + 
-      ", irvine - " + SCORE_DELTAS["irvine"]);
-    SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.ScoreDeltas, 
-      { "Deltas" : SCORE_DELTAS });
-    SCORE_DELTAS = {"illinois" : 0, "irvine" : 0};
-  }
-}, 5000);
-
+// var totalScoreInterval = setInterval(function () {    
+//   if (!SCORE_CLIENT_SOCKET) {
+//     // console.log("score client not found");
+//   }
+//   else {
+//     console.log("score deltas, illinois - " + SCORE_DELTAS["illinois"] + 
+//       ", irvine - " + SCORE_DELTAS["irvine"]);
+//     SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.ScoreDeltas, 
+//       { "Deltas" : SCORE_DELTAS });
+//     SCORE_DELTAS = {"illinois" : 0, "irvine" : 0};
+//   }
+// }, 5000);
 
 var levelUpInterval = setInterval(function () {
   ACTIVE_LEVEL++;
-  io.sockets.emit(ClientMessage.LevelUp, 
-    { "Level" : ACTIVE_LEVEL });
-}, 30000);
+  LEVEL_SETTING = LEVEL_SETTINGS[ACTIVE_LEVEL];
+  io.sockets.emit(ClientMessage.LevelSetting, { 
+    "Level" : ACTIVE_LEVEL,
+    "TotalDancers" : LEVEL_SETTING.TotalDancers,
+    "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
+  });
+}, 10000);
