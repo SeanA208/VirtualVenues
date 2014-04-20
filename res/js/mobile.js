@@ -1,7 +1,49 @@
+/* 
+ * NOTE: 
+ *  (PRESERVE THE SCRIPT REFERENCE ORDER)
+ *  demo.js script is included in index.html before this file
+ *  so global variables and methods are  accessible in this file
+ *
+ * Wait for everything to load
+ */
+
+//Use the proper host
+var LOCAL_DEBUG = true; 
+var HOST =  LOCAL_DEBUG ?
+    'localhost' :
+    'ec2-54-83-22-126.compute-1.amazonaws.com';
+var socket = io.connect(HOST);
+
+// Message Type Definitions (copy from server.js)
+var ServerMessage = {
+  LevelSetting : "levelsetting",
+  Quiz : "quiz"
+};
+
+var ClientMessage = {
+  QuizAnswer : "quizanswer"
+};
+
+// State Variables
+var LEVEL_SETTING = null;
+
+/* 
+    Handlers
+*/
+socket.on(ServerMessage.LevelSetting, function (data) {
+    console.log(data);
+    LEVEL_SETTING = data;
+    // changeLevelSetting(LEVEL_SETTING);
+});
+
+socket.on(ServerMessage.Quiz, function (data) {
+    console.log('client: quiz message');
+});
+
 var teamName = null; 
 var previousAnswer = null;
-var numDancers=5;
-var numEfforts =1;
+var numDancers = 5;
+var numEfforts = 1;
 
 $(document).ready(function() {
     console.log("an image is clicked!");

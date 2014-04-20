@@ -110,9 +110,11 @@ io.sockets.on('connection', function (socket) {
   console.log('server: established a connection');
 
   // Notify client of the current level
+  console.log('server: sending level setting');
   socket.emit(ServerMessage.LevelSetting, {
     "Level" : ACTIVE_LEVEL,
-    "Setting" : LEVEL_SETTING
+    "TotalDancers" : LEVEL_SETTING.TotalDancers,
+    "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
   });
 
   // Client Handlers
@@ -166,6 +168,7 @@ io.sockets.on('connection', function (socket) {
 var levelUpInterval = setInterval(function () {
   ACTIVE_LEVEL++;
   LEVEL_SETTING = LEVEL_SETTINGS[ACTIVE_LEVEL];
+  console.log('server: sending level setting');
   io.sockets.emit(ClientMessage.LevelSetting, { 
     "Level" : ACTIVE_LEVEL,
     "TotalDancers" : LEVEL_SETTING.TotalDancers,
