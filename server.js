@@ -87,6 +87,11 @@ io.sockets.on('connection', function (socket) {
     else {
       HISTOGRAM_DELTAS[data.PreviousAnswer] -= 1;
     }
+    if (SCORE_CLIENT_SOCKET){
+      SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.HistogramDeltas, { "Deltas" : HISTOGRAM_DELTAS });
+      HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];  
+    }
+    
   });
 
   // Score Client Handlers
@@ -112,16 +117,6 @@ var totalScoreInterval = setInterval(function () {
   }
 }, 5000);
 
-var histogramInterval = setInterval(function () {
-  if (!SCORE_CLIENT_SOCKET) {
-    // console.log("score client not found");
-  }
-  else {
-    SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.HistogramDeltas,
-      { "Deltas" : HISTOGRAM_DELTAS });
-    HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];
-  }
-}, 5000);
 
 var levelUpInterval = setInterval(function () {
   ACTIVE_LEVEL++;
