@@ -45,13 +45,26 @@ var previousAnswer = null;
 var numDancers = 5;
 var numEfforts = 1;
 
+function changeLevelSetting(LEVEL_SETTING){
+    console.log("recieved message from client")
+    numDancers = LEVEL_SETTING.TotalDancers;
+    numEfforts = LEVEL_SETTING.EffortsPerDancer;
+    console.log=("dancers: "+numDancers+", efforts: "+numEfforts);
+};
+
+function loadDancerButtons(num){
+    $("#dancerbar").empty();
+    for (i=1;i<=num;i++){
+        $("#dancerbar").append("<a class =\"btn btn-default\" role =\"button\" id=\"dancer"+i+"\">"+i+"</a>");
+    }
+};
+
 $(document).ready(function() {
+
     console.log("an image is clicked!");
     $("#titleinfo").text("Pick "+numEfforts+" efforts for each dancer");
   
-    for (i=1;i<=numDancers;i++){
-        $("#dancerbar").append("<a class =\"btn btn-default\" role =\"button\" id=\"dancer"+i+"\">"+i+"</a>");
-    }
+    loadDancerButtons(numDancers); 
   
     if (getCookieValue('team') != false) {
         teamName = getCookieValue('team');
