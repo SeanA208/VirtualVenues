@@ -63,6 +63,16 @@ function loadDancerButtons(num){
     });
 };
 
+function sendQuizAnswer() {
+    var currentAnswer = {
+        "Level" : LEVEL_SETTING.Level,
+        "DancerEfforts" : {}
+    };
+    for (var i = 0; i < LEVEL_SETTING.TotalDancers; i += 1) {
+        currentAnswer["DancerEfforts"]; // TODO: Add here
+    };
+};
+
 $(document).ready(function() {
 
     console.log("an image is clicked!");

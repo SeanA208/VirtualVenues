@@ -23,14 +23,14 @@ var LEVEL_SETTING = {
 
 // TEST
 // Hard coded settings per level
-var LEVEL_SETTINGS = {
-  0 : {"TotalDancers" : 2, "EffortsPerDancer" : 1, 
+var LEVEL_SETTINGS = [
+  {"TotalDancers" : 2, "EffortsPerDancer" : 1, 
     "DancerEfforts" : {0 : [0], 2 : [2]}},
-  1 : {"TotalDancers" : 3, " EffortsPerDancer" : 2, 
+  {"TotalDancers" : 3, " EffortsPerDancer" : 2, 
     "DancerEfforts" : {0 : [6, 7], 1 : [2, 3], 2: [1, 2]}},
-  2 : {"TotalDancers" : 4, "EfforsPerDancer" : 2,
+  {"TotalDancers" : 4, "EfforsPerDancer" : 2,
     "DancerEfforts" : {0 : [0, 1], 1 : [2, 3], 2 : [4, 5], 3 : [6,7]}}
-}
+];
 
 // Message Type Definitions
 var ServerMessage = { 
@@ -149,29 +149,16 @@ io.sockets.on('connection', function (socket) {
   });
 });
 
-/* 
-  Timer Actions
-*/
-// var totalScoreInterval = setInterval(function () {    
-//   if (!SCORE_CLIENT_SOCKET) {
-//     // console.log("score client not found");
-//   }
-//   else {
-//     console.log("score deltas, illinois - " + SCORE_DELTAS["illinois"] + 
-//       ", irvine - " + SCORE_DELTAS["irvine"]);
-//     SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.ScoreDeltas, 
-//       { "Deltas" : SCORE_DELTAS });
-//     SCORE_DELTAS = {"illinois" : 0, "irvine" : 0};
-//   }
-// }, 5000);
-
 var levelUpInterval = setInterval(function () {
-  ACTIVE_LEVEL++;
-  LEVEL_SETTING = LEVEL_SETTINGS[ACTIVE_LEVEL];
-  console.log('server: sending level setting');
-  io.sockets.emit(ClientMessage.LevelSetting, { 
-    "Level" : ACTIVE_LEVEL,
-    "TotalDancers" : LEVEL_SETTING.TotalDancers,
-    "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
-  });
-}, 10000);
+  if (ACTIVE_LEVEL < LEVEL_SETTINGS.length - 1) {
+    ACTIVE_LEVEL++;
+    LEVEL_SETTING = LEVEL_SETTINGS[ACTIVE_LEVEL];
+    console.log(LEVEL_SETTING);
+    console.log('server: sending level setting');
+    io.sockets.emit(ServerMessage.LevelSetting, { 
+      "Level" : ACTIVE_LEVEL,
+      "TotalDancers" : LEVEL_SETTING.TotalDancers,
+      "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
+    });
+  }
+}, 7000);
