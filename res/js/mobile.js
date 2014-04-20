@@ -13,7 +13,12 @@ var HOST =  LOCAL_DEBUG ?
     'localhost' :
     'ec2-54-83-22-126.compute-1.amazonaws.com';
 var socket = io.connect(HOST);
-
+var teamName = null; 
+var previousAnswer = null;
+var numDancers = 1;
+var numEfforts = 1;
+var currDancerID=null;
+var currEffortsNum=0;
 // Message Type Definitions (copy from server.js)
 var ServerMessage = {
   LevelSetting : "levelsetting",
@@ -32,51 +37,43 @@ var LEVEL_SETTING = null;
 */
 socket.on(ServerMessage.LevelSetting, function (data) {
     console.log(data);
-    LEVEL_SETTING = data;
-    // changeLevelSetting(LEVEL_SETTING);
+    console.log("recieved message from client")
+    numDancers = data.TotalDancers;
+    numEfforts = data.EffortsPerDancer;
+    console.log("dancers: "+numDancers+", efforts: "+numEfforts);
+    $("#titleinfo").text("Pick "+numEfforts+" efforts for each dancer");
+    loadDancerButtons(numDancers);
+
 });
 
 socket.on(ServerMessage.Quiz, function (data) {
     console.log('client: quiz message');
 });
 
-var teamName = null; 
-var previousAnswer = null;
-var numDancers = 5;
-var numEfforts = 1;
-
-function changeLevelSetting(LEVEL_SETTING){
-    console.log("recieved message from client")
-    numDancers = LEVEL_SETTING.TotalDancers;
-    numEfforts = LEVEL_SETTING.EffortsPerDancer;
-    console.log=("dancers: "+numDancers+", efforts: "+numEfforts);
-};
-
 function loadDancerButtons(num){
     $("#dancerbar").empty();
     for (i=1;i<=num;i++){
         $("#dancerbar").append("<a class =\"btn btn-default\" role =\"button\" id=\"dancer"+i+"\">"+i+"</a>");
     }
+
+    $(".btn-default").click(function(){
+        console.log("clicked dancer");
+        currDancerID=$(this).attr("id");
+        alert(currDancerID);
+    });
 };
 
 $(document).ready(function() {
 
     console.log("an image is clicked!");
-    $("#titleinfo").text("Pick "+numEfforts+" efforts for each dancer");
-  
-    loadDancerButtons(numDancers); 
-  
+   
+
     if (getCookieValue('team') != false) {
         teamName = getCookieValue('team');
         console.log("Previous Value:"+teamName);
         $("#teaminfo").hide();
         $("#effortsinfo").show();
     }
-
-    $(".btn-default").click(function(){
-        console.log("clicked dancer1");
-        alert("hi");
-    });
 
     $(".team").click(function() {
     	console.log("an image of a team is clicked!");
@@ -91,10 +88,10 @@ $(document).ready(function() {
     });
 
     $(".effort").click(function() {
+        currEffortsNum+=1;
     	console.log("an image of an effort is clicked!");
         $("*").css("border", "none");
         $(this).css("border", "2px #f33 solid");
-//      $("#dancerbar").empty();
         var answer = parseInt($(this).attr("effortid"));
         if (answer != previousAnswer) {
             socket.emit(ClientMessage.QuizAnswer, 
@@ -103,4 +100,6 @@ $(document).ready(function() {
         }
 
     });
+        
+
 });
