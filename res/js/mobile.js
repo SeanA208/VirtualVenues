@@ -158,10 +158,6 @@ $(document).ready(function() {
             //mark as unchecked
             $(this).data("clicked", 0);
         }
-<<<<<<< HEAD
-
-=======
->>>>>>> FETCH_HEAD
     });
 
      /* call this function when the answer is complete*/
