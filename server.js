@@ -26,7 +26,7 @@ var LEVEL_SETTING = {
 var LEVEL_SETTINGS = [
   {"TotalDancers" : 2, "EffortsPerDancer" : 1, 
     "DancerEfforts" : {0 : [0], 2 : [2]}},
-  {"TotalDancers" : 3, " EffortsPerDancer" : 2, 
+  {"TotalDancers" : 3, "EffortsPerDancer" : 2, 
     "DancerEfforts" : {0 : [6, 7], 1 : [2, 3], 2: [1, 2]}},
   {"TotalDancers" : 4, "EffortsPerDancer" : 2,
     "DancerEfforts" : {0 : [0, 1], 1 : [2, 3], 2 : [4, 5], 3 : [6,7]}}
