@@ -100,6 +100,7 @@ function getScoreChange(message) {
       }
     }
   }
+  console.log('answer score: ' + count);
   return count;
 };
 
