@@ -19,6 +19,7 @@ var numDancers = 0;
 var numEfforts = 1;
 var currDancerID = null;
 var currLevel = null;
+
 var currentAnswer = {
     "Level" : null,
     "DancerEfforts" : {}
@@ -47,6 +48,8 @@ socket.on(ServerMessage.LevelSetting, function (data) {
     numDancers = LEVEL_SETTING.TotalDancers;
     numEfforts = LEVEL_SETTING.EffortsPerDancer;
     currLevel = LEVEL_SETTING.Level;    
+    currentAnswer.Level = LEVEL_SETTING.Level; 
+
     console.log("dancers: "+numDancers+", efforts: "+numEfforts);
     $("#titleinfo").text("Pick "+numEfforts+" per dancer");
     $("#titleinfo").css({
@@ -63,20 +66,29 @@ socket.on(ServerMessage.Quiz, function (data) {
 function loadDancerButtons(num){
     $("#dancerbar").empty();
     for (i=1;i<=num;i++){
-        $("#dancerbar").append("<a class =\"btn btn-primary\" role =\"button\" id=\""+i+"\">"+i+"</a>");
+        $("#dancerbar").append("<a class =\"btn btn-primary\" data-clicked =0 role =\"button\" id=\""+i+"\">"+i+"</a>");
     }
 
     $(".btn-primary").click(function(){
         currDancerID = $(this).attr("id");
         if (!(currDancerID in currentAnswer.DancerEfforts)){
-            currentAnswer.DancerEfforts[currDancerID]=[]
-        };
-        console.log("clicked dancerID = " + currDancerID);
-        
+            currentAnswer.DancerEfforts[currDancerID]=[];
+        }
+        if ($(this).data('clicked')==0) {
+            console.log("clicked dancerID = "+currDancerID);
+            $(this).addClass('active');
+            $(this).data('clicked',1)
+        }
+        else{
+            console.log("unclicked dancerID = "+currDancerID);
+            $(this).removeClass('active');
+            $(this).data('clicked',0)
+        }
+
         //empty borders and check marks from the previous dancer       
         $(".effort").each(function(){
             $(this).css("border", "none");
-            $(this).data("clicked","0");
+            $(this).data("clicked",0);
         });
     });
 };
@@ -109,7 +121,7 @@ $(document).ready(function() {
         //set border
         var answer = parseInt($(this).attr("effortid"));
             
-        if ($(this).data("clicked") == "0"){
+        if ($(this).data("clicked") == 0){
             console.log("first click")
             //check if the efforts array is full already
             if (!currentAnswer.DancerEfforts[currDancerID]) {
@@ -127,7 +139,7 @@ $(document).ready(function() {
                 console.log(currDancerID + ":" + currentAnswer.DancerEfforts[currDancerID].join());
                 
                 //check clicked
-                $(this).data("clicked", "1")
+                $(this).data("clicked",1);
             }
             else{
                 alert("You have checked " + numEfforts + " efforts already");
@@ -136,7 +148,7 @@ $(document).ready(function() {
         else{
             //remove border
             $(this).css("border", "none");
-            console.log("second click")   
+            console.log("second click");   
             
             //remove from the dictionary
             var index = currentAnswer.DancerEfforts[currDancerID].indexOf(answer);
@@ -144,15 +156,17 @@ $(document).ready(function() {
             console.log(currDancerID + ":" + currentAnswer.DancerEfforts[currDancerID].join());
             
             //mark as unchecked
-            $(this).data("clicked", "0")
+            $(this).data("clicked", 0);
+        }
+
         }
     });
 
      /* call this function when the answer is complete*/
     $("#sendInfo").click(function(){
         currentAnswer.Level = currLevel;
-        socket.emit(ClientMessage.QuizAnswer, currentAnswer)
-        console.log(currentAnswer); 
+        console.log(currentAnswer);
+        socket.emit(ClientMessage.QuizAnswer,currentAnswer)
     });    
 
 });
