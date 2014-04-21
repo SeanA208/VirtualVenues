@@ -53,7 +53,7 @@ socket.on(ServerMessage.LevelSetting, function (data) {
     console.log("dancers: "+numDancers+", efforts: "+numEfforts);
     $("#titleinfo").text("Pick "+numEfforts+" per dancer");
     $("#titleinfo").css({
-        "font-family" : "Chicago, Charcoal, sans-seriff",
+        //"font-family" : "Chicago, Verdana, sans-seriff",
         "font-size" : "medium"
     });
     loadDancerButtons(numDancers);
@@ -139,7 +139,7 @@ $(document).ready(function() {
                 console.log(currDancerID + ":" + currentAnswer.DancerEfforts[currDancerID].join());
                 
                 //check clicked
-                $(this).data("clicked",1);
+                $(this).data("clicked", 1);
             }
             else{
                 alert("You have checked " + numEfforts + " efforts already");
@@ -158,7 +158,10 @@ $(document).ready(function() {
             //mark as unchecked
             $(this).data("clicked", 0);
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> FETCH_HEAD
     });
 
      /* call this function when the answer is complete*/
