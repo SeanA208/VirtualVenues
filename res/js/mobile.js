@@ -75,12 +75,12 @@ function loadDancerButtons(num){
         if ($(this).data('clicked')==0) {
             console.log("clicked dancerID = "+currDancerID);
             $(this).addClass('active');
-            $(this).data('clicked',1)
+            $(this).data('clicked',1);
         }
         else{
             console.log("unclicked dancerID = "+currDancerID);
             $(this).removeClass('active');
-            $(this).data('clicked',0)
+            $(this).data('clicked',0);
         }
 
         //empty borders and check marks from the previous dancer       
