@@ -159,7 +159,6 @@ $(document).ready(function() {
             $(this).data("clicked", 0);
         }
 
-        }
     });
 
      /* call this function when the answer is complete*/
