@@ -10,7 +10,7 @@
 //Use the proper host
 var LOCAL_DEBUG = true; 
 var HOST =  LOCAL_DEBUG ?
-    '10.100.128.162' :
+    'localhost' :
     'ec2-54-83-22-126.compute-1.amazonaws.com';
 var socket = io.connect(HOST);
 var teamName = null; 
@@ -73,7 +73,7 @@ function cleanUpEfforts(){
 function loadDancerButtons(num){
     $("#dancerbar").empty();
     for (i=0;i<num;i++){
-        $("#dancerbar").append("<a class =\"btn btn-primary\" data-clicked =0 role =\"button\" id="+i+">"+i+"</a>");
+        $("#dancerbar").append("<a class =\"btn btn-primary\" data-clicked =0 role =\"button\" id="+i+">"+(i+1)+"</a>");
     }
 
     $(".btn-primary").click(function(){
