@@ -6,8 +6,6 @@
  *
  * Wait for everything to load
  */
-
-//Use the proper host
 var LOCAL_DEBUG = true; 
 var HOST =  LOCAL_DEBUG ?
     'localhost' :
@@ -50,8 +48,8 @@ socket.on(ServerMessage.LevelSetting, function (data) {
     currLevel = LEVEL_SETTING.Level;    
     currentAnswer.Level = LEVEL_SETTING.Level; 
 
-    console.log("dancers: "+numDancers+", efforts: "+numEfforts);
-    $("#titleinfo").text("Pick "+numEfforts+" per dancer");
+    console.log("dancers: " + numDancers + ", efforts: " + numEfforts);
+    $("#titleinfo").text("Pick " + numEfforts + " per dancer");
     $("#titleinfo").css({
         //"font-family" : "Chicago, Verdana, sans-seriff",
         "font-size" : "medium"
@@ -65,53 +63,58 @@ socket.on(ServerMessage.Quiz, function (data) {
 });
 
 function cleanUpEfforts(){
-    $(".effort").each(function(){
+    $(".effort").each(function() {
         $(this).css("border", "none");
-        $(this).data("clicked",0);        
+        $(this).data("clicked", 0);        
     });
 }
-function loadDancerButtons(num){
+function loadDancerButtons(num) {
+    // Clear all previous dancer buttons
     $("#dancerbar").empty();
-    for (i=0;i<num;i++){
-        $("#dancerbar").append("<a class =\"btn btn-primary\" data-clicked =0 role =\"button\" id="+i+">"+(i+1)+"</a>");
+
+    // Apend an appropriate number of dancer buttons for this level
+    // Start an empty list of effort guesses for each dancer
+    for (i = 1; i <= num; i += 1) {
+        $("#dancerbar").append(
+            "<a class =\"btn btn-primary\" data-clicked=0 role=\"button\"" +
+                "id=\"" + i + "\">" + i + 
+            "</a>"
+        );
+        currentAnswer.DancerEfforts[i] = [];
     }
 
-    $(".btn-primary").click(function(){
+    // Set the button dancer click handlers
+    $(".btn-primary").click(function() {
+        // Get the ID of the clicked dancer
         currDancerID = parseInt($(this).attr("id"));
-        if (!(currDancerID in currentAnswer.DancerEfforts)){
-            currentAnswer.DancerEfforts[currDancerID]=[];
-        }
 
-
-        if ($(this).data('clicked')==0) {
-            console.log("clicked dancerID = "+currDancerID);
-            //look checked
-            if(previousDancer!=null){
+        // If switching from another dancer (or none), lookup previous effort guesses
+        if ($(this).data('clicked') === 0) {
+            console.log("clicked dancerID = " + currDancerID);
+            
+            // Deactivate previous dancer button
+            if(previousDancer != null){
                 previousDancer.removeClass('active');
-                previousDancer.data('clicked',0);
+                previousDancer.data('clicked', 0);
             }
+
+            // Activate the button for the current dancer
             $(this).addClass('active');
-            $(this).data('clicked',1);
+            $(this).data('clicked', 1);
             previousDancer = $(this);
-            //show all checked efforts
+
+            // Highlight all already chosen efforts
             $(".effort").each(function(){
-                
                 var currEffortID = parseInt($(this).attr("effortid"));
-                
-                if (jQuery.inArray(currEffortID, currentAnswer.DancerEfforts[currDancerID]) != -1){
+                if (jQuery.inArray(currEffortID, currentAnswer.DancerEfforts[currDancerID]) > -1){
                     $(this).css("border", "2px #f33 solid");
-                    $(this).data("clicked",1);
+                    $(this).data("clicked", 1);
                 }
                 else {
                     $(this).css("border", "none");
-                    $(this).data("clicked",0);
+                    $(this).data("clicked", 0);
                 }
             });
-        }
-        else{
-            console.log("unclicked dancerID = "+currDancerID);
-            $(this).removeClass('active');
-            $(this).data('clicked',0);
         }
     });
 };
@@ -123,8 +126,9 @@ function showDangerAlert(text){
 
 $(document).ready(function() {
     console.log("an image is clicked!");
-    loadDancerButtons(numDancers);
+    // loadDancerButtons(numDancers);
 
+    // Check cookies if a team has already been chosen
     if (getCookieValue('team') != false) {
         teamName = getCookieValue('team');
         console.log("Previous Value:"+teamName);
@@ -132,6 +136,7 @@ $(document).ready(function() {
         $("#effortsinfo").show();
     }
 
+    // Set the chosen team and store it in cookie for 30 minutes
     $(".team").click(function() {
     	console.log("an image of a team is clicked!");
         $(this).css("border", "2px #f33 solid");
@@ -144,57 +149,61 @@ $(document).ready(function() {
         $("#effortsinfo").show();
     });
     
-    /* one click add it to the complete answer */
+    // Add or remove the effort guess for the selected dancer (if any)
     $(".effort").click(function() {
-        //set border
         var answer = parseInt($(this).attr("effortid"));
             
-        if ($(this).data("clicked") == 0){
-            console.log("first click")
-            //check if the efforts array is full already
-            if (!currentAnswer.DancerEfforts[currDancerID]) {
-                showDangerAlert("Pick a dancer first");
+        // If the effort hasn't been clicked
+        if ($(this).data("clicked") == 0) {
+
+            // Check if the max number of efforts has already been chosen
+            if (!currDancerID || !currentAnswer.DancerEfforts[currDancerID]) {
+                showDangerAlert("Pick a dancer first!");
                 return;
             }
-            if (currentAnswer.DancerEfforts[currDancerID].length != numEfforts){
-            //add border
+
+            if (currentAnswer.DancerEfforts[currDancerID].length != numEfforts) {
+                // Add border
                 $(this).css("border", "2px #f33 solid");
             
-                //add answer to the dictionary
-                if (jQuery.inArray(answer, currentAnswer.DancerEfforts[currDancerID]) == -1){
+                // Add answer to the dictionary if it's not already there
+                if (jQuery.inArray(answer, currentAnswer.DancerEfforts[currDancerID]) === -1) {
                     currentAnswer.DancerEfforts[currDancerID].push(answer);
                 }
                 console.log(currDancerID + ":" + currentAnswer.DancerEfforts[currDancerID].join());
                 
-                //check clicked
+                // check clicked
                 $(this).data("clicked", 1);
             }
-            else{
+            else {
                 showDangerAlert("You have checked " + numEfforts + " efforts already");
                 return;
             }
         }
-        else{
-            //remove border
-            $(this).css("border", "none");
-            console.log("second click");   
+        // If effort already clicked, unclick it
+        else {
+            // Remove border
+            $(this).css("border", "none"); 
             
-            //remove from the dictionary
+            // Remove from the answer
             var index = currentAnswer.DancerEfforts[currDancerID].indexOf(answer);
             currentAnswer.DancerEfforts[currDancerID].splice(index, 1);
             console.log(currDancerID + ":" + currentAnswer.DancerEfforts[currDancerID].join());
             
-            //mark as unchecked
+            // Unclick
             $(this).data("clicked", 0);
         }
     });
 
-     /* call this function when the answer is complete*/
-    $("#sendInfo").click(function(){
+    // User sends an answer to the server
+    $("#sendInfo").click(function() {
+        var data = {};
         currentAnswer.Level = currLevel;
-        console.log(currentAnswer);
-        socket.emit(ClientMessage.QuizAnswer,currentAnswer)
-    });    
+        data.Answer = currentAnswer;
+        console.log(data);
+        socket.emit(ClientMessage.QuizAnswer, data);
+    });   
+
     $(".close").click(function(){
         $(".alert").hide();
     });

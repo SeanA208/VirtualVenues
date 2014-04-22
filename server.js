@@ -17,19 +17,19 @@ var LEVEL_SETTING = {
   "TotalDancers" : 2,
   "EffortsPerDancer" : 1,
   "DancerEfforts" : { 
-    1 : [0], 
-    2 : [2]}
+    '1' : [0], 
+    '2' : [2]}
 };
 
 // TEST
 // Hard coded settings per level
 var LEVEL_SETTINGS = [
   {"TotalDancers" : 2, "EffortsPerDancer" : 1, 
-    "DancerEfforts" : {1 : [0], 2 : [2]}},
+    "DancerEfforts" : {'1' : [0], '2' : [2]}},
   {"TotalDancers" : 3, "EffortsPerDancer" : 2, 
-    "DancerEfforts" : {1 : [6, 7], 2 : [2, 3], 3: [1, 2]}},
+    "DancerEfforts" : {'1' : [6, 7], '2' : [2, 3], '3': [1, 2]}},
   {"TotalDancers" : 4, "EffortsPerDancer" : 2,
-    "DancerEfforts" : {1 : [0, 1], 2 : [2, 3], 3 : [4, 5], 4 : [6,7]}}
+    "DancerEfforts" : {'1' : [0, 1], '2' : [2, 3], '3' : [4, 5], '4' : [6,7]}}
 ];
 
 // Message Type Definitions
@@ -88,16 +88,26 @@ function getScoreChange(message) {
       for (var dancerId in message.Answer.DancerEfforts) {
         // Check if the dancer is actually dancing this level
         if (dancerId in LEVEL_SETTING["DancerEfforts"]) {
+          console.log("Guess for dancer: " + dancerId);
           // Check if the effort guess is correct
-          for (var effortId in message.Answer.DancerEfforts[dancerId]) {
-            for (var correctEffortId in LEVEL_SETTING["DancerEfforts"][dancerId]) {
-              if (effortId === correctEffortId) {
-                count += 1;
-              }
+          for (var i = 0; i < message.Answer.DancerEfforts[dancerId].length; i += 1) {
+            var effortId = message.Answer.DancerEfforts[dancerId][i];
+            console.log("\t Effort: " + effortId);
+            if (LEVEL_SETTING.DancerEfforts[dancerId].indexOf(parseInt(effortId)) > -1) {
+              count += 1;
+            }
+            else {
+              console.log("\t Incorrect effort guess: " + effortId); 
             }
           }
         }
+        else {
+          console.log("Dancer not in current level: " + dancerId);
+        }
       }
+    }
+    else {
+      console.log("Different levels, current - " + ACTIVE_LEVEL + ", active - " + message.Answer.Level);
     }
   }
   console.log('answer score: ' + count);
@@ -123,7 +133,7 @@ io.sockets.on('connection', function (socket) {
     console.log('server: quiz answer');
     console.log(data);  
     var scoreChange = getScoreChange(data);
-    if (scoreChange !== 0) {
+    if (scoreChange !== 0 && SCORE_CLIENT_SOCKET) {
       SCORE_DELTAS[data.Team] += scoreChange;   
       SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.ScoreDeltas, 
         { "Deltas" : SCORE_DELTAS });   
@@ -162,4 +172,4 @@ var levelUpInterval = setInterval(function () {
       "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
     });
   }
-}, 10000);
+}, 15000);
