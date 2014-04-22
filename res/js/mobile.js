@@ -10,7 +10,7 @@
 //Use the proper host
 var LOCAL_DEBUG = true; 
 var HOST =  LOCAL_DEBUG ?
-    '10.100.128.162' :
+    'localhost' :
     'ec2-54-83-22-126.compute-1.amazonaws.com';
 var socket = io.connect(HOST);
 var teamName = null; 

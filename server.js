@@ -17,19 +17,19 @@ var LEVEL_SETTING = {
   "TotalDancers" : 2,
   "EffortsPerDancer" : 1,
   "DancerEfforts" : { 
-    0 : [0], 
-    1 : [2]}
+    1 : [0], 
+    2 : [2]}
 };
 
 // TEST
 // Hard coded settings per level
 var LEVEL_SETTINGS = [
   {"TotalDancers" : 2, "EffortsPerDancer" : 1, 
-    "DancerEfforts" : {0 : [0], 2 : [2]}},
+    "DancerEfforts" : {1 : [0], 2 : [2]}},
   {"TotalDancers" : 3, "EffortsPerDancer" : 2, 
-    "DancerEfforts" : {0 : [6, 7], 1 : [2, 3], 2: [1, 2]}},
+    "DancerEfforts" : {1 : [6, 7], 2 : [2, 3], 3: [1, 2]}},
   {"TotalDancers" : 4, "EffortsPerDancer" : 2,
-    "DancerEfforts" : {0 : [0, 1], 1 : [2, 3], 2 : [4, 5], 3 : [6,7]}}
+    "DancerEfforts" : {1 : [0, 1], 2 : [2, 3], 3 : [4, 5], 4 : [6,7]}}
 ];
 
 // Message Type Definitions
@@ -162,4 +162,4 @@ var levelUpInterval = setInterval(function () {
       "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
     });
   }
-}, 7000);
+}, 10000);
