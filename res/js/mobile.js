@@ -73,6 +73,9 @@ function loadDancerButtons(num) {
     // Clear all previous dancer buttons
     $("#dancerbar").empty();
 
+    // Clear answers
+    currentAnswer.DancerEfforts = {};
+
     // Clear box highlights for all efforts
     $(".effort").css("box-shadow", "");
 
@@ -236,7 +239,8 @@ $(document).ready(function() {
         data.PreviousAnswer = previousAnswer;
         console.log(data);
         socket.emit(ClientMessage.QuizAnswer, data);
-        previousAnswer = currentAnswer;
+        // Make a deep copy of the current answer as previous
+        previousAnswer = jQuery.extend(true, {}, currentAnswer);
     });   
 
     $(".close").click(function(){

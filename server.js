@@ -161,6 +161,9 @@ io.sockets.on('connection', function (socket) {
         }
       }
     }
+    else {
+      console.log('\t no previous answer');
+    }
     
     if (SCORE_CLIENT_SOCKET){
       console.log(HISTOGRAM_DELTAS);
