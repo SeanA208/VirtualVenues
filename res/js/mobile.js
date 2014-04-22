@@ -100,6 +100,7 @@ function loadDancerButtons(num){
                 
                 if (jQuery.inArray(currEffortID, currentAnswer.DancerEfforts[currDancerID]) != -1){
                     $(this).css("border", "2px #f33 solid");
+                    $(this).data("clicked",1);
                 }
                 else {
                     $(this).css("border", "none");
@@ -116,11 +117,8 @@ function loadDancerButtons(num){
 };
 
 function showDangerAlert(text){
-    //$('<h3>'+text+'</h3>').appendTo(".alert");
     $("#alertTextID").text(text);
     $(".alert").show()
-    $(".alert").alert();
-              
 };
 
 $(document).ready(function() {
@@ -156,7 +154,6 @@ $(document).ready(function() {
             //check if the efforts array is full already
             if (!currentAnswer.DancerEfforts[currDancerID]) {
                 showDangerAlert("Pick a dancer first");
-                //alert("Pick a dancer first");
                 return;
             }
             if (currentAnswer.DancerEfforts[currDancerID].length != numEfforts){
@@ -174,7 +171,7 @@ $(document).ready(function() {
             }
             else{
                 showDangerAlert("You have checked " + numEfforts + " efforts already");
-                //alert("You have checked " + numEfforts + " efforts already");
+                return;
             }
         }
         else{
