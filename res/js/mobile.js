@@ -73,7 +73,7 @@ function cleanUpEfforts(){
 function loadDancerButtons(num){
     $("#dancerbar").empty();
     for (i=0;i<num;i++){
-        $("#dancerbar").append("<a class =\"btn btn-primary\" data-clicked =0 role =\"button\" id="+i+">"+i+"</a>");
+        $("#dancerbar").append("<a class =\"btn btn-primary\" data-clicked =0 role =\"button\" id="+i+">"+(i+1)+"</a>");
     }
 
     $(".btn-primary").click(function(){
