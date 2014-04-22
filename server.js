@@ -127,31 +127,46 @@ io.sockets.on('connection', function (socket) {
   socket.on(ClientMessage.QuizAnswer, function(data) {  
     console.log('server: quiz answer');
     console.log(data);  
+
     if (data.Answer.Level != ACTIVE_LEVEL) {
       console.log("\t quiz answer level is different from current");
       return;
     }
+
+    if (!SCORE_CLIENT_SOCKET) {
+      console.log ("\t score client not connected");
+      return;
+    }
+
     var currentScore = getScoreChange(data.Answer);
     var previousScore = getScoreChange(data.PreviousAnswer);
     var scoreChange = currentScore - previousScore;
-    if (scoreChange != 0 && SCORE_CLIENT_SOCKET) {
-      SCORE_DELTAS[data.Team] += scoreChange;   
+    if (scoreChange != 0) {
+      SCORE_DELTAS[data.Team] = scoreChange;   
+      console.log(SCORE_DELTAS);
       SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.ScoreDeltas, 
         { "Deltas" : SCORE_DELTAS });   
     }
 
-    HISTOGRAM_DELTAS[data.Answer] += 1;
-    if (data.PreviousAnswer === -1) {
-      console.log('\t no previous answer'); 
+    for (var dancerId in data.Answer.DancerEfforts) {
+      for (var i = 0; i < data.Answer.DancerEfforts[dancerId].length; i += 1) {
+        HISTOGRAM_DELTAS[data.Answer.DancerEfforts[dancerId][i]] += 1;    
+      }
     }
-    else {
-      HISTOGRAM_DELTAS[data.PreviousAnswer] -= 1;
+
+    if (data.PreviousAnswer) {
+      for (var dancerId in data.PreviousAnswer.DancerEfforts) {
+        for (var i = 0; i < data.PreviousAnswer.DancerEfforts[dancerId].length; i += 1) {
+          HISTOGRAM_DELTAS[data.PreviousAnswer.DancerEfforts[dancerId][i]] -= 1;
+        }
+      }
     }
+    
     if (SCORE_CLIENT_SOCKET){
+      console.log(HISTOGRAM_DELTAS);
       SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.HistogramDeltas, { "Deltas" : HISTOGRAM_DELTAS });
       HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];  
     }
-    
   });
 
   // Score Client Handlers

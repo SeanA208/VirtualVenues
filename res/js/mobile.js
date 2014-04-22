@@ -123,17 +123,17 @@ function loadDancerButtons(num) {
             previousDancer = $(this);
 
             // Highlight all already chosen efforts
-            $(".effort").each(function(){
-                var currEffortID = parseInt($(this).attr("effortid"));
-                if (jQuery.inArray(currEffortID, currentAnswer.DancerEfforts[currDancerID]) > -1){
-                    $(this).css("border", "2px #f33 solid");
-                    $(this).data("clicked", 1);
-                }
-                else {
-                    $(this).css("border", "none");
-                    $(this).data("clicked", 0);
-                }
-            });
+            // $(".effort").each(function(){
+            //     var currEffortID = parseInt($(this).attr("effortid"));
+            //     if (jQuery.inArray(currEffortID, currentAnswer.DancerEfforts[currDancerID]) > -1){
+            //         $(this).css("border", "2px #f33 solid");
+            //         $(this).data("clicked", 1);
+            //     }
+            //     else {
+            //         $(this).css("border", "none");
+            //         $(this).data("clicked", 0);
+            //     }
+            // });
         }
     });
 };
@@ -231,6 +231,7 @@ $(document).ready(function() {
     $("#sendInfo").click(function() {
         var data = {};
         currentAnswer.Level = currLevel;
+        data.Team = teamName;
         data.Answer = currentAnswer;
         data.PreviousAnswer = previousAnswer;
         console.log(data);

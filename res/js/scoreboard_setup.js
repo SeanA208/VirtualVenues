@@ -1,5 +1,5 @@
 // Connect to the server
-var LOCAL_DEBUG = false; 
+var LOCAL_DEBUG = true; 
 var HOST = LOCAL_DEBUG ? 
 	'localhost' : 
 	'ec2-54-83-22-126.compute-1.amazonaws.com';
