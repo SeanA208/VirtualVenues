@@ -10,7 +10,7 @@
 //Use the proper host
 var LOCAL_DEBUG = true; 
 var HOST =  LOCAL_DEBUG ?
-    'localhost' :
+    '10.100.128.162' :
     'ec2-54-83-22-126.compute-1.amazonaws.com';
 var socket = io.connect(HOST);
 var teamName = null; 
@@ -63,6 +63,7 @@ socket.on(ServerMessage.LevelSetting, function (data) {
 socket.on(ServerMessage.Quiz, function (data) {
     console.log('client: quiz message');
 });
+
 function cleanUpEfforts(){
     $(".effort").each(function(){
         $(this).css("border", "none");
@@ -114,6 +115,14 @@ function loadDancerButtons(num){
     });
 };
 
+function showDangerAlert(text){
+    //$('<h3>'+text+'</h3>').appendTo(".alert");
+    $("#alertTextID").text(text);
+    $(".alert").show()
+    $(".alert").alert();
+              
+};
+
 $(document).ready(function() {
     console.log("an image is clicked!");
     loadDancerButtons(numDancers);
@@ -146,7 +155,8 @@ $(document).ready(function() {
             console.log("first click")
             //check if the efforts array is full already
             if (!currentAnswer.DancerEfforts[currDancerID]) {
-                alert("Pick a dancer first");
+                showDangerAlert("Pick a dancer first");
+                //alert("Pick a dancer first");
                 return;
             }
             if (currentAnswer.DancerEfforts[currDancerID].length != numEfforts){
@@ -163,7 +173,8 @@ $(document).ready(function() {
                 $(this).data("clicked", 1);
             }
             else{
-                alert("You have checked " + numEfforts + " efforts already");
+                showDangerAlert("You have checked " + numEfforts + " efforts already");
+                //alert("You have checked " + numEfforts + " efforts already");
             }
         }
         else{
@@ -187,5 +198,7 @@ $(document).ready(function() {
         console.log(currentAnswer);
         socket.emit(ClientMessage.QuizAnswer,currentAnswer)
     });    
-
+    $(".close").click(function(){
+        $(".alert").hide();
+    });
 });
