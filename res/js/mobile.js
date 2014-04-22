@@ -22,6 +22,7 @@ var currentAnswer = {
     "Level" : null,
     "DancerEfforts" : {}
 };
+var COLORS = ["crimson", "indigo", "yellowgreen", "teal", "salmon", "plum", "lavender", "aqua"];
 
 // State Variables
 var LEVEL_SETTING = null;
@@ -68,6 +69,7 @@ function cleanUpEfforts(){
         $(this).data("clicked", 0);        
     });
 }
+
 function loadDancerButtons(num) {
     // Clear all previous dancer buttons
     $("#dancerbar").empty();
@@ -80,6 +82,11 @@ function loadDancerButtons(num) {
                 "id=\"" + i + "\">" + i + 
             "</a>"
         );
+        var color = COLORS[(i - 1) % COLORS.length];
+        $("#" + i).css({
+            "background-color" : color,
+            "border-color" : color
+        });
         currentAnswer.DancerEfforts[i] = [];
     }
 
@@ -164,7 +171,8 @@ $(document).ready(function() {
 
             if (currentAnswer.DancerEfforts[currDancerID].length != numEfforts) {
                 // Add border
-                $(this).css("border", "2px #f33 solid");
+                var color = COLORS[(currDancerID - 1) %COLORS.length];
+                $(this).css("border", "2px " + color + " solid");
             
                 // Add answer to the dictionary if it's not already there
                 if (jQuery.inArray(answer, currentAnswer.DancerEfforts[currDancerID]) === -1) {
