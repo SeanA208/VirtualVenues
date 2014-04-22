@@ -6,7 +6,7 @@
  *
  * Wait for everything to load
  */
-var LOCAL_DEBUG = true; 
+var LOCAL_DEBUG = true;
 var HOST =  LOCAL_DEBUG ?
     'localhost' :
     'ec2-54-83-22-126.compute-1.amazonaws.com';
@@ -22,6 +22,7 @@ var currentAnswer = {
     "Level" : null,
     "DancerEfforts" : {}
 };
+var previousAnswer = null;
 var COLORS = ["crimson", "indigo", "yellowgreen", "teal", "salmon", "plum", "lavender", "aqua"];
 
 // State Variables
@@ -41,8 +42,6 @@ var ClientMessage = {
     Handlers
 */
 socket.on(ServerMessage.LevelSetting, function (data) {
-    console.log(data);
-    console.log("recieved message from client")
     LEVEL_SETTING = data;
     numDancers = LEVEL_SETTING.TotalDancers;
     numEfforts = LEVEL_SETTING.EffortsPerDancer;
@@ -155,14 +154,14 @@ $(document).ready(function() {
         $("#effortsinfo").show();
     }
 
-    // Set the chosen team and store it in cookie for 30 minutes
+    // Set the chosen team and store it in cookies for 30 minutes
     $(".team").click(function() {
     	console.log("an image of a team is clicked!");
         $(this).css("border", "2px #f33 solid");
        
         teamName = $(this).attr('team');
         console.log(teamName);
-        writeSessionCookie('team',teamName);
+        writeSessionCookie('team', teamName);
         
         $("#teaminfo").hide();
         $("#effortsinfo").show();
@@ -233,8 +232,10 @@ $(document).ready(function() {
         var data = {};
         currentAnswer.Level = currLevel;
         data.Answer = currentAnswer;
+        data.PreviousAnswer = previousAnswer;
         console.log(data);
         socket.emit(ClientMessage.QuizAnswer, data);
+        previousAnswer = currentAnswer;
     });   
 
     $(".close").click(function(){

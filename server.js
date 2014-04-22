@@ -79,38 +79,33 @@ function tcp_handler(socket) {
 
 // Calculates correct quiz answer matches
 // NOTE: Doesn't consider previous answer yet
-function getScoreChange(message) {
+function getScoreChange(answer) {
+  console.log("Calculating score for quiz answer");
   var count = 0;
-  if (message && message.Answer) {
-    // If Server and Client levels are the same
-    if (message.Answer.Level == ACTIVE_LEVEL) {
-      // Loop through each dancer
-      for (var dancerId in message.Answer.DancerEfforts) {
-        // Check if the dancer is actually dancing this level
-        if (dancerId in LEVEL_SETTING["DancerEfforts"]) {
-          console.log("Guess for dancer: " + dancerId);
-          // Check if the effort guess is correct
-          for (var i = 0; i < message.Answer.DancerEfforts[dancerId].length; i += 1) {
-            var effortId = message.Answer.DancerEfforts[dancerId][i];
-            console.log("\t Effort: " + effortId);
-            if (LEVEL_SETTING.DancerEfforts[dancerId].indexOf(parseInt(effortId)) > -1) {
-              count += 1;
-            }
-            else {
-              console.log("\t Incorrect effort guess: " + effortId); 
-            }
+  if (answer) {
+    // Loop through each dancer
+    for (var dancerId in answer.DancerEfforts) {
+      // Check if the dancer is actually dancing this level
+      if (dancerId in LEVEL_SETTING["DancerEfforts"]) {
+        console.log("\t Guess for dancer: " + dancerId);
+        // Check if the effort guess is correct
+        for (var i = 0; i < answer.DancerEfforts[dancerId].length; i += 1) {
+          var effortId = answer.DancerEfforts[dancerId][i];
+          console.log("\t Effort: " + effortId);
+          if (LEVEL_SETTING.DancerEfforts[dancerId].indexOf(parseInt(effortId)) > -1) {
+            count += 1;
+          }
+          else {
+            console.log("\t Incorrect effort guess: " + effortId); 
           }
         }
-        else {
-          console.log("Dancer not in current level: " + dancerId);
-        }
+      }
+      else {
+        console.log("\t Dancer not in current level: " + dancerId);
       }
     }
-    else {
-      console.log("Different levels, current - " + ACTIVE_LEVEL + ", active - " + message.Answer.Level);
-    }
   }
-  console.log('answer score: ' + count);
+  console.log('\t Answer score: ' + count);
   return count;
 };
 
@@ -132,8 +127,14 @@ io.sockets.on('connection', function (socket) {
   socket.on(ClientMessage.QuizAnswer, function(data) {  
     console.log('server: quiz answer');
     console.log(data);  
-    var scoreChange = getScoreChange(data);
-    if (scoreChange !== 0 && SCORE_CLIENT_SOCKET) {
+    if (data.Answer.Level != ACTIVE_LEVEL) {
+      console.log("\t quiz answer level is different from current");
+      return;
+    }
+    var currentScore = getScoreChange(data.Answer);
+    var previousScore = getScoreChange(data.PreviousAnswer);
+    var scoreChange = currentScore - previousScore;
+    if (scoreChange != 0 && SCORE_CLIENT_SOCKET) {
       SCORE_DELTAS[data.Team] += scoreChange;   
       SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.ScoreDeltas, 
         { "Deltas" : SCORE_DELTAS });   
@@ -141,7 +142,7 @@ io.sockets.on('connection', function (socket) {
 
     HISTOGRAM_DELTAS[data.Answer] += 1;
     if (data.PreviousAnswer === -1) {
-      console.log('no previous answer'); 
+      console.log('\t no previous answer'); 
     }
     else {
       HISTOGRAM_DELTAS[data.PreviousAnswer] -= 1;
