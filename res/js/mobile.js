@@ -19,7 +19,7 @@ var numDancers = 0;
 var numEfforts = 1;
 var currDancerID = null;
 var currLevel = null;
-
+var previousDancer = null;
 var currentAnswer = {
     "Level" : null,
     "DancerEfforts" : {}
@@ -56,40 +56,61 @@ socket.on(ServerMessage.LevelSetting, function (data) {
         //"font-family" : "Chicago, Verdana, sans-seriff",
         "font-size" : "medium"
     });
+    cleanUpEfforts();
     loadDancerButtons(numDancers);
 });
 
 socket.on(ServerMessage.Quiz, function (data) {
     console.log('client: quiz message');
 });
-
+function cleanUpEfforts(){
+    $(".effort").each(function(){
+        $(this).css("border", "none");
+        $(this).data("clicked",0);        
+    });
+}
 function loadDancerButtons(num){
     $("#dancerbar").empty();
-    for (i=1;i<=num;i++){
-        $("#dancerbar").append("<a class =\"btn btn-primary\" data-clicked =0 role =\"button\" id=\""+i+"\">"+i+"</a>");
+    for (i=0;i<num;i++){
+        $("#dancerbar").append("<a class =\"btn btn-primary\" data-clicked =0 role =\"button\" id="+i+">"+i+"</a>");
     }
 
     $(".btn-primary").click(function(){
-        currDancerID = $(this).attr("id");
+        currDancerID = parseInt($(this).attr("id"));
         if (!(currDancerID in currentAnswer.DancerEfforts)){
             currentAnswer.DancerEfforts[currDancerID]=[];
         }
+
+
         if ($(this).data('clicked')==0) {
             console.log("clicked dancerID = "+currDancerID);
+            //look checked
+            if(previousDancer!=null){
+                previousDancer.removeClass('active');
+                previousDancer.data('clicked',0);
+            }
             $(this).addClass('active');
             $(this).data('clicked',1);
+            previousDancer = $(this);
+            //show all checked efforts
+            $(".effort").each(function(){
+                
+                var currEffortID = parseInt($(this).attr("effortid"));
+                
+                if (jQuery.inArray(currEffortID, currentAnswer.DancerEfforts[currDancerID]) != -1){
+                    $(this).css("border", "2px #f33 solid");
+                }
+                else {
+                    $(this).css("border", "none");
+                    $(this).data("clicked",0);
+                }
+            });
         }
         else{
             console.log("unclicked dancerID = "+currDancerID);
             $(this).removeClass('active');
             $(this).data('clicked',0);
         }
-
-        //empty borders and check marks from the previous dancer       
-        $(".effort").each(function(){
-            $(this).css("border", "none");
-            $(this).data("clicked",0);
-        });
     });
 };
 
@@ -129,7 +150,7 @@ $(document).ready(function() {
                 return;
             }
             if (currentAnswer.DancerEfforts[currDancerID].length != numEfforts){
-                //add border
+            //add border
                 $(this).css("border", "2px #f33 solid");
             
                 //add answer to the dictionary
