@@ -74,8 +74,12 @@ function loadDancerButtons(num) {
     // Clear all previous dancer buttons
     $("#dancerbar").empty();
 
+    // Clear box highlights for all efforts
+    $(".effort").css("box-shadow", "");
+
     // Apend an appropriate number of dancer buttons for this level
     // Start an empty list of effort guesses for each dancer
+    var boxShadows = [];
     for (i = 1; i <= num; i += 1) {
         $("#dancerbar").append(
             "<a class =\"btn btn-primary\" data-clicked=0 role=\"button\"" +
@@ -88,7 +92,16 @@ function loadDancerButtons(num) {
             "border-color" : color
         });
         currentAnswer.DancerEfforts[i] = [];
+        
+        // Generate black box around each effort for each dancer
+        boxShadows.push("black 0px 0px 0px " + (2 * i) + "px");
     }
+
+    // Set up the black boxes for all efforts
+    $(".effort").css({
+        "box-shadow" : boxShadows.join(),
+        'margin' : (num * 2) + "px"
+    });
 
     // Set the button dancer click handlers
     $(".btn-primary").click(function() {
@@ -133,7 +146,6 @@ function showDangerAlert(text){
 
 $(document).ready(function() {
     console.log("an image is clicked!");
-    // loadDancerButtons(numDancers);
 
     // Check cookies if a team has already been chosen
     if (getCookieValue('team') != false) {
@@ -170,9 +182,16 @@ $(document).ready(function() {
             }
 
             if (currentAnswer.DancerEfforts[currDancerID].length != numEfforts) {
+                var color = COLORS[(currDancerID - 1) % COLORS.length];
+
                 // Add border
-                var color = COLORS[(currDancerID - 1) %COLORS.length];
-                $(this).css("border", "2px " + color + " solid");
+                var boxShadows = $(this).css("box-shadow");
+                var boxShadowRegex = /rgb\((\d*),\s(\d)*,(\s\d*)\)\s\dpx\s\dpx\s\dpx\s\dpx/g;
+                var boxShadowsArray = boxShadows.match(boxShadowRegex);
+                var dancerBoxShadow = boxShadowsArray[currDancerID - 1];
+                dancerBoxShadow = dancerBoxShadow.replace(/rgb\((\d*),\s(\d*),\s(\d*)\)/, color);
+                boxShadowsArray[currDancerID - 1] = dancerBoxShadow;
+                $(this).css("box-shadow", boxShadowsArray.join(','));
             
                 // Add answer to the dictionary if it's not already there
                 if (jQuery.inArray(answer, currentAnswer.DancerEfforts[currDancerID]) === -1) {
@@ -191,7 +210,13 @@ $(document).ready(function() {
         // If effort already clicked, unclick it
         else {
             // Remove border
-            $(this).css("border", "none"); 
+            var boxShadows = $(this).css("box-shadow");
+            var boxShadowRegex = /rgb\((\d*),\s(\d)*,(\s\d*)\)\s\dpx\s\dpx\s\dpx\s\dpx/g;
+            var boxShadowsArray = boxShadows.match(boxShadowRegex);
+            var dancerBoxShadow = boxShadowsArray[currDancerID - 1];
+            dancerBoxShadow = dancerBoxShadow.replace(/rgb\((\d*),\s(\d*),\s(\d*)\)/, "black");
+            boxShadowsArray[currDancerID - 1] = dancerBoxShadow;
+            $(this).css("box-shadow", boxShadowsArray.join(','));
             
             // Remove from the answer
             var index = currentAnswer.DancerEfforts[currDancerID].indexOf(answer);
