@@ -11,8 +11,8 @@ var express = require('express')
 // State variables
 var SCORE_DELTAS = {"illinois" : 0, "irvine" : 0};
 var HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];
-var SCORE_CLIENT_SOCKET_UIUC = null;
-var SCORE_CLIENT_SOCKET_IRVINE = null;
+var SCORE_CLIENT_SOCKET_UIUC = new Array();
+var SCORE_CLIENT_SOCKET_IRVINE = new Array();
 var ACTIVE_LEVEL = 0;
 var LEVEL_SETTING = {
   "TotalDancers" : 2,
@@ -134,11 +134,11 @@ io.sockets.on('connection', function (socket) {
       return;
     }
 
-    if (data.Team == 'illinois' && !SCORE_CLIENT_SOCKET_UIUC) {
+    if (data.Team == 'illinois' && SCORE_CLIENT_SOCKET_UIUC.length == 0) {
       console.log ("\t score client not connected for UIUC");
       return;
     }
-    else if(data.Team == 'irvine' && !SCORE_CLIENT_SOCKET_IRVINE ) {
+    else if(data.Team == 'irvine' && !SCORE_CLIENT_SOCKET_IRVINE.length == 0 ) {
       console.log ("\t score client not connected for Irvine");
       return;
     }
@@ -151,17 +151,21 @@ io.sockets.on('connection', function (socket) {
       SCORE_DELTAS[data.Team] = scoreChange;
       console.log('Score Deltas: ');   
       console.log(SCORE_DELTAS);
-      if(data.Team == 'illinois' && SCORE_CLIENT_SOCKET_UIUC) 
+      if(data.Team == 'illinois' && SCORE_CLIENT_SOCKET_UIUC.length > 0) 
       {
         console.log('server: Illinois Score emit');
-        SCORE_CLIENT_SOCKET_UIUC.emit(ScoreClientMessage.ScoreDeltas, 
+        for(var i=0; i<SCORE_CLIENT_SOCKET_UIUC.length; i++) {
+          SCORE_CLIENT_SOCKET_UIUC[i].emit(ScoreClientMessage.ScoreDeltas, 
           { "Deltas" : SCORE_DELTAS }); 
+        }
       }
-      else if( data.Team == 'irvine' && SCORE_CLIENT_SOCKET_IRVINE )
+      else if( data.Team == 'irvine' && SCORE_CLIENT_SOCKET_IRVINE.length > 0 )
       {
         console.log('server: irvine Score emit');
-        SCORE_CLIENT_SOCKET_IRVINE.emit(ScoreClientMessage.ScoreDeltas, 
+        for (var i = 0; i <SCORE_CLIENT_SOCKET_IRVINE.length; i++) {
+          SCORE_CLIENT_SOCKET_IRVINE[i].emit(ScoreClientMessage.ScoreDeltas, 
           { "Deltas" : SCORE_DELTAS });
+        }
       }  
     }
 
@@ -182,16 +186,20 @@ io.sockets.on('connection', function (socket) {
       console.log('\t no previous answer');
     }
     
-    if (data.Team == 'illinois' && SCORE_CLIENT_SOCKET_UIUC){
+    if (data.Team == 'illinois' && SCORE_CLIENT_SOCKET_UIUC.length > 0 ){
       console.log('UIUC HistogramDeltas');
       console.log(HISTOGRAM_DELTAS);
-      SCORE_CLIENT_SOCKET_UIUC.emit(ScoreClientMessage.HistogramDeltas, { "Deltas" : HISTOGRAM_DELTAS, "Team": data.Team });
+      for ( var i=0; i < SCORE_CLIENT_SOCKET_UIUC.length; i++ ) {
+        SCORE_CLIENT_SOCKET_UIUC[i].emit(ScoreClientMessage.HistogramDeltas, { "Deltas" : HISTOGRAM_DELTAS, "Team": data.Team });
+      }
       HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];  
     }
-    else if (data.Team == 'irvine' && SCORE_CLIENT_SOCKET_IRVINE){
+    else if (data.Team == 'irvine' && SCORE_CLIENT_SOCKET_IRVINE.length > 0){
       console.log('Irvine HistogramDeltas');
       console.log(HISTOGRAM_DELTAS);
-      SCORE_CLIENT_SOCKET_IRVINE.emit(ScoreClientMessage.HistogramDeltas, { "Deltas" : HISTOGRAM_DELTAS, "Team": data.Team });
+      for( var i=0; i < SCORE_CLIENT_SOCKET_IRVINE.length; i++ ) {
+        SCORE_CLIENT_SOCKET_IRVINE[i].emit(ScoreClientMessage.HistogramDeltas, { "Deltas" : HISTOGRAM_DELTAS, "Team": data.Team });
+      }
       HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];  
     }
   });
@@ -202,13 +210,32 @@ io.sockets.on('connection', function (socket) {
     if (data.Team == 'illinois')
     {
       console.log("server: score client set for UIUC");
-      SCORE_CLIENT_SOCKET_UIUC = socket;
+      SCORE_CLIENT_SOCKET_UIUC.push(socket);
     }
     else if (data.Team == 'irvine') {
       console.log("server: score client set for Irvine");
-      SCORE_CLIENT_SOCKET_IRVINE = socket;
+      SCORE_CLIENT_SOCKET_IRVINE.push(socket);
     }
   });
+
+  socket.on('disconnect', function() {
+    console.log('disconnect!!!');
+    for (var indexNum = SCORE_CLIENT_SOCKET_UIUC.length - 1; indexNum >= 0; indexNum--) 
+    {
+      if ( SCORE_CLIENT_SOCKET_UIUC[indexNum] === socket ) {
+        console.log('disconnect for UIUC scoreboard');
+        SCORE_CLIENT_SOCKET_UIUC.splice(indexNum, 1);
+      }
+    }
+    for (var indexNum = SCORE_CLIENT_SOCKET_IRVINE.length - 1; indexNum >= 0; indexNum--) 
+    {
+      if ( SCORE_CLIENT_SOCKET_IRVINE[indexNum] === socket ) {
+        console.log('disconnect for irvine scoreboard');
+        SCORE_CLIENT_SOCKET_IRVINE.splice(indexNum, 1);
+      }
+    }
+  });
+
 });
 
 var levelUpInterval = setInterval(function () {
