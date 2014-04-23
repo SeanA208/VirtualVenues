@@ -45,7 +45,16 @@ $(document).ready(function() {
 	);
 
 	// Notify the server you're the scoreboard
-	socket.emit(ScoreClientMessage.Connection);
+	if(!getCookieValue('team')) {
+		var teamValue = confirm('Are you illinois?');
+		if (teamValue == true) {
+			writeSessionCookie('team', 'illinois');
+		}
+		else {
+			writeSessionCookie('team', 'irvine');
+		}
+	}
+	socket.emit(ScoreClientMessage.Connection, {'Team':getCookieValue('team') });
 
 	socket.on(ServerMessage.ActiveLevel, function (data) {
 		console.log('scoreboard: active level message');
@@ -90,7 +99,14 @@ $(document).ready(function() {
 				NEW_SCORES[i] = (EFFORT_SCORES[i] < 0 ? 0 : EFFORT_SCORES[i]);
 			}
 			console.log("new histogram values");
-			graph.update(NEW_SCORES);
+			if(getCookieValue('team') == data.Team) {
+				console.log("YEP! They are the same");
+				graph.update(NEW_SCORES);
+				console.log(NEW_SCORES);
+			}
+			else{
+				console.log("Sorry they are not equal");
+			}
 		}
 	});
 });	
