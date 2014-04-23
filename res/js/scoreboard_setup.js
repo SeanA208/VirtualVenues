@@ -59,7 +59,7 @@ $(document).ready(function() {
 	var parametersString = window.location.search.substr(1);
 	var parameters = {};
     var parametersArray = parametersString.split("&");
-    for (var i = 0; i < prmarr.length; i += 1) {
+    for (var i = 0; i < parametersArray.length; i += 1) {
         var tmparr = prmarr[i].split("=");
         params[tmparr[0]] = tmparr[1];
     }
