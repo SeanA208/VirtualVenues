@@ -94,7 +94,7 @@ $(document).ready(function() {
 			return;
 		}
 		else {
-			var NEW_SCORES = [0, 0, 0, 0, 0, 0, 0, 0]
+			var NEW_SCORES = [0, 0, 0, 0, 0, 0, 0, 0];
 			for (var i = 0; i < data.Deltas.length; i += 1) {
 				EFFORT_SCORES[i] += data.Deltas[i];
 				NEW_SCORES[i] = (EFFORT_SCORES[i] < 0 ? 0 : EFFORT_SCORES[i]);

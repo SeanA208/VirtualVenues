@@ -157,7 +157,8 @@ io.sockets.on('connection', function (socket) {
         SCORE_CLIENT_SOCKET_UIUC.emit(ScoreClientMessage.ScoreDeltas, 
           { "Deltas" : SCORE_DELTAS }); 
       }
-      else if(SCORE_CLIENT_SOCKET_IRVINE )
+      
+      if(SCORE_CLIENT_SOCKET_IRVINE )
       {
         console.log('server: irvine Score emit');
         SCORE_CLIENT_SOCKET_IRVINE.emit(ScoreClientMessage.ScoreDeltas, 
