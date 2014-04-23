@@ -13,6 +13,7 @@ var SCORE_DELTAS = {"illinois" : 0, "irvine" : 0};
 var HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];
 var SCORE_CLIENT_SOCKET_UIUC = null;
 var SCORE_CLIENT_SOCKET_IRVINE = null;
+var ADMIN_SOCKET = null;
 var ACTIVE_LEVEL = 0;
 var LEVEL_SETTING = {
   "TotalDancers" : 2,
@@ -48,6 +49,11 @@ var ScoreClientMessage = {
   ScoreDeltas : "scoredeltas",
   EffortDeltas : "effortdeltas" 
 };
+
+var AdminClientMessage = {
+  Connection : "adminconnection",
+  ChangeLevel : "adminchangelevel"
+}
 
 // Used ports and IP addresses
 var HTTP_PORT = 8080
@@ -209,18 +215,45 @@ io.sockets.on('connection', function (socket) {
       SCORE_CLIENT_SOCKET_IRVINE = socket;
     }
   });
+
+  // Admin Client Handlers
+  socket.on(AdminClientMessage.Connection, function() {
+    console.log("server: admin client connected");
+    ADMIN_SOCKET = socket;
+  });
+
+  socket.on(AdminClientMessage.ChangeLevel, function(data) {
+    console.log("server: admin supplying new level information");
+    if (data.level)
+      ACTIVE_LEVEL = data.level;
+    if (data.totalDancers)
+      LEVEL_SETTING.TotalDancers = data.totalDancers;
+    if (data.effortsPerDancer)
+      LEVEL_SETTING.EffortsPerDancer = data.effortsPerDancer;
+
+    sendLevelUpdates();
+  })
 });
 
-var levelUpInterval = setInterval(function () {
-  if (ACTIVE_LEVEL < LEVEL_SETTINGS.length - 1) {
-    ACTIVE_LEVEL++;
-    LEVEL_SETTING = LEVEL_SETTINGS[ACTIVE_LEVEL];
-    console.log(LEVEL_SETTING);
-    console.log('server: sending level setting');
-    io.sockets.emit(ServerMessage.LevelSetting, { 
-      "Level" : ACTIVE_LEVEL,
-      "TotalDancers" : LEVEL_SETTING.TotalDancers,
-      "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
-    });
-  }
-}, 15000);
+function sendLevelUpdates() {
+  console.log('server: sending level setting with level ' + ACTIVE_LEVEL);
+  io.sockets.emit(ServerMessage.LevelSetting, { 
+    "Level" : ACTIVE_LEVEL,
+    "TotalDancers" : LEVEL_SETTING.TotalDancers,
+    "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
+  });
+}
+
+// var levelUpInterval = setInterval(function () {
+//   if (ACTIVE_LEVEL < LEVEL_SETTINGS.length - 1) {
+//     ACTIVE_LEVEL++;
+//     LEVEL_SETTING = LEVEL_SETTINGS[ACTIVE_LEVEL];
+//     console.log(LEVEL_SETTING);
+//     console.log('server: sending level setting');
+//     io.sockets.emit(ServerMessage.LevelSetting, { 
+//       "Level" : ACTIVE_LEVEL,
+//       "TotalDancers" : LEVEL_SETTING.TotalDancers,
+//       "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
+//     });
+//   }
+// }, 15000);
