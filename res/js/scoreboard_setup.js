@@ -56,9 +56,9 @@ $(document).ready(function() {
 	}
 
 	// Get team name from the url
-	var getParameters = window.location.search.substr(1);
+	var parametersString = window.location.search.substr(1);
 	var parameters = {};
-    var parametersArray = prmstr.split("&");
+    var parametersArray = parametersString.split("&");
     for (var i = 0; i < prmarr.length; i += 1) {
         var tmparr = prmarr[i].split("=");
         params[tmparr[0]] = tmparr[1];
