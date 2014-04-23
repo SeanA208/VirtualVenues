@@ -54,7 +54,16 @@ $(document).ready(function() {
 			writeSessionCookie('team', 'irvine');
 		}
 	}
-	socket.emit(ScoreClientMessage.Connection, {'Team':getCookieValue('team') });
+
+	// Get team name from the url
+	var getParameters = window.location.search.substr(1);
+	var parameters = {};
+    var parametersArray = prmstr.split("&");
+    for (var i = 0; i < prmarr.length; i += 1) {
+        var tmparr = prmarr[i].split("=");
+        params[tmparr[0]] = tmparr[1];
+    }
+	socket.emit(ScoreClientMessage.Connection, {'Team' : parameters.team });
 
 	socket.on(ServerMessage.ActiveLevel, function (data) {
 		console.log('scoreboard: active level message');
