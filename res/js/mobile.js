@@ -6,7 +6,7 @@
  *
  * Wait for everything to load
  */
-var LOCAL_DEBUG = false;
+var LOCAL_DEBUG = true;
 var HOST =  LOCAL_DEBUG ?
     'localhost' :
     'ec2-54-83-22-126.compute-1.amazonaws.com';
@@ -129,9 +129,9 @@ function loadDancerButtons(num) {
 };
 
 function showDangerAlert(text){
-    bootbox.alert(text, function(){
-        console.log("alert callback")
-    });
+    // bootbox.alert(text, function(){
+    //     console.log("alert callback")
+    // });
     $("#alertTextID").text(text);
     $(".alert").show();
 };

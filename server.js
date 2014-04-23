@@ -151,13 +151,13 @@ io.sockets.on('connection', function (socket) {
       SCORE_DELTAS[data.Team] = scoreChange;
       console.log('Score Deltas: ');   
       console.log(SCORE_DELTAS);
-      if(data.Team == 'illinois' && SCORE_CLIENT_SOCKET_UIUC) 
+      if (SCORE_CLIENT_SOCKET_UIUC) 
       {
         console.log('server: Illinois Score emit');
         SCORE_CLIENT_SOCKET_UIUC.emit(ScoreClientMessage.ScoreDeltas, 
           { "Deltas" : SCORE_DELTAS }); 
       }
-      else if( data.Team == 'irvine' && SCORE_CLIENT_SOCKET_IRVINE )
+      else if(SCORE_CLIENT_SOCKET_IRVINE )
       {
         console.log('server: irvine Score emit');
         SCORE_CLIENT_SOCKET_IRVINE.emit(ScoreClientMessage.ScoreDeltas, 
