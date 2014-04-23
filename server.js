@@ -11,7 +11,8 @@ var express = require('express')
 // State variables
 var SCORE_DELTAS = {"illinois" : 0, "irvine" : 0};
 var HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];
-var SCORE_CLIENT_SOCKET = null;
+var SCORE_CLIENT_SOCKET_UIUC = null;
+var SCORE_CLIENT_SOCKET_IRVINE = null;
 var ACTIVE_LEVEL = 0;
 var LEVEL_SETTING = {
   "TotalDancers" : 2,
@@ -133,19 +134,35 @@ io.sockets.on('connection', function (socket) {
       return;
     }
 
-    if (!SCORE_CLIENT_SOCKET) {
-      console.log ("\t score client not connected");
+    if (data.Team == 'illinois' && !SCORE_CLIENT_SOCKET_UIUC) {
+      console.log ("\t score client not connected for UIUC");
+      return;
+    }
+    else if(data.Team == 'irvine' && !SCORE_CLIENT_SOCKET_IRVINE ) {
+      console.log ("\t score client not connected for Irvine");
       return;
     }
 
     var currentScore = getScoreChange(data.Answer);
     var previousScore = getScoreChange(data.PreviousAnswer);
     var scoreChange = currentScore - previousScore;
+    console.log('scoreChange:' + scoreChange);
     if (scoreChange != 0) {
-      SCORE_DELTAS[data.Team] = scoreChange;   
+      SCORE_DELTAS[data.Team] = scoreChange;
+      console.log('Score Deltas: ');   
       console.log(SCORE_DELTAS);
-      SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.ScoreDeltas, 
-        { "Deltas" : SCORE_DELTAS });   
+      if(data.Team == 'illinois' && SCORE_CLIENT_SOCKET_UIUC) 
+      {
+        console.log('server: Illinois Score emit');
+        SCORE_CLIENT_SOCKET_UIUC.emit(ScoreClientMessage.ScoreDeltas, 
+          { "Deltas" : SCORE_DELTAS }); 
+      }
+      else if( data.Team == 'irvine' && SCORE_CLIENT_SOCKET_IRVINE )
+      {
+        console.log('server: irvine Score emit');
+        SCORE_CLIENT_SOCKET_IRVINE.emit(ScoreClientMessage.ScoreDeltas, 
+          { "Deltas" : SCORE_DELTAS });
+      }  
     }
 
     for (var dancerId in data.Answer.DancerEfforts) {
@@ -165,17 +182,32 @@ io.sockets.on('connection', function (socket) {
       console.log('\t no previous answer');
     }
     
-    if (SCORE_CLIENT_SOCKET){
+    if (data.Team == 'illinois' && SCORE_CLIENT_SOCKET_UIUC){
+      console.log('UIUC HistogramDeltas');
       console.log(HISTOGRAM_DELTAS);
-      SCORE_CLIENT_SOCKET.emit(ScoreClientMessage.HistogramDeltas, { "Deltas" : HISTOGRAM_DELTAS });
+      SCORE_CLIENT_SOCKET_UIUC.emit(ScoreClientMessage.HistogramDeltas, { "Deltas" : HISTOGRAM_DELTAS, "Team": data.Team });
+      HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];  
+    }
+    else if (data.Team == 'irvine' && SCORE_CLIENT_SOCKET_IRVINE){
+      console.log('Irvine HistogramDeltas');
+      console.log(HISTOGRAM_DELTAS);
+      SCORE_CLIENT_SOCKET_IRVINE.emit(ScoreClientMessage.HistogramDeltas, { "Deltas" : HISTOGRAM_DELTAS, "Team": data.Team });
       HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];  
     }
   });
 
   // Score Client Handlers
-  socket.on(ScoreClientMessage.Connection, function() {
+  socket.on(ScoreClientMessage.Connection, function (data) {
     console.log("server: score client connected");
-    SCORE_CLIENT_SOCKET = socket;
+    if (data.Team == 'illinois')
+    {
+      console.log("server: score client set for UIUC");
+      SCORE_CLIENT_SOCKET_UIUC = socket;
+    }
+    else if (data.Team == 'irvine') {
+      console.log("server: score client set for Irvine");
+      SCORE_CLIENT_SOCKET_IRVINE = socket;
+    }
   });
 });
 
