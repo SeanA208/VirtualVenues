@@ -162,6 +162,12 @@ $(document).ready(function() {
         var answer = parseInt($(this).attr("effortid"));
         var color = COLORS[(currDancerID - 1) % COLORS.length];
 
+        // Check if a dancer has been selected
+        if (!currDancerID || !currentAnswer.DancerEfforts[currDancerID]) {
+            showDangerAlert("Pick a dancer first!");
+            return;
+        }
+
         // Add or remove the border depending on the current border color
         // If black, color it, else blacken it
         var boxShadows = $(this).css("box-shadow");
@@ -169,44 +175,25 @@ $(document).ready(function() {
         var boxShadowsArray = boxShadows.match(boxShadowRegex);
         var dancerBoxShadow = boxShadowsArray[currDancerID - 1];
         if (dancerBoxShadow.match(/rgb\(0,\s0,\s0\)/) != null) { // black check
-            dancerBoxShadow = dancerBoxShadow.replace(/rgb\((\d*),\s(\d*),\s(\d*)\)/, color);
-        } else {
-            dancerBoxShadow = dancerBoxShadow.replace(/rgb\((\d*),\s(\d*),\s(\d*)\)/, 'black');
-        }
-        boxShadowsArray[currDancerID - 1] = dancerBoxShadow;
-        $(this).css("box-shadow", boxShadowsArray.join(','));
-
-        // If the effort hasn't been clicked
-        if ($(this).data("clicked") == 0) {
-            // Check if a dancer has been selected
-            if (!currDancerID || !currentAnswer.DancerEfforts[currDancerID]) {
-                showDangerAlert("Pick a dancer first!");
-                return;
-            }
-
-            // Check if the max number of efforts has already been chosen
             if (currentAnswer.DancerEfforts[currDancerID].length != numEfforts) {
+                dancerBoxShadow = dancerBoxShadow.replace(/rgb\((\d*),\s(\d*),\s(\d*)\)/, color);
+
                 // Add answer to the dictionary if it's not already there
                 if (jQuery.inArray(answer, currentAnswer.DancerEfforts[currDancerID]) === -1) {
                     currentAnswer.DancerEfforts[currDancerID].push(answer);
                 }
-                console.log(currDancerID + ":" + currentAnswer.DancerEfforts[currDancerID].join());
-                
-                // check clicked
-                $(this).data("clicked", 1);
-            } else {
+            } else { 
                 showDangerAlert("You have checked " + numEfforts + " efforts already");
                 return;
             }
         } else {
-            // Remove from the answer
+            dancerBoxShadow = dancerBoxShadow.replace(/rgb\((\d*),\s(\d*),\s(\d*)\)/, 'black');
             var index = currentAnswer.DancerEfforts[currDancerID].indexOf(answer);
             currentAnswer.DancerEfforts[currDancerID].splice(index, 1);
             console.log(currDancerID + ":" + currentAnswer.DancerEfforts[currDancerID].join());
-            
-            // Unclick
-            $(this).data("clicked", 0);
         }
+        boxShadowsArray[currDancerID - 1] = dancerBoxShadow;
+        $(this).css("box-shadow", boxShadowsArray.join(','));
     });
 
     // User sends an answer to the server
