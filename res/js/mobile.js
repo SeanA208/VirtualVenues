@@ -124,26 +124,13 @@ function loadDancerButtons(num) {
             $(this).addClass('active');
             $(this).data('clicked', 1);
             previousDancer = $(this);
-
-            // Highlight all already chosen efforts
-            // $(".effort").each(function(){
-            //     var currEffortID = parseInt($(this).attr("effortid"));
-            //     if (jQuery.inArray(currEffortID, currentAnswer.DancerEfforts[currDancerID]) > -1){
-            //         $(this).css("border", "2px #f33 solid");
-            //         $(this).data("clicked", 1);
-            //     }
-            //     else {
-            //         $(this).css("border", "none");
-            //         $(this).data("clicked", 0);
-            //     }
-            // });
         }
     });
 };
 
 function showDangerAlert(text){
     $("#alertTextID").text(text);
-    $(".alert").show()
+    $(".alert").show();
 };
 
 $(document).ready(function() {
@@ -173,28 +160,32 @@ $(document).ready(function() {
     // Add or remove the effort guess for the selected dancer (if any)
     $(".effort").click(function() {
         var answer = parseInt($(this).attr("effortid"));
-            
+        var color = COLORS[(currDancerID - 1) % COLORS.length];
+
+        // Add or remove the border depending on the current border color
+        // If black, color it, else blacken it
+        var boxShadows = $(this).css("box-shadow");
+        var boxShadowRegex = /rgb\((\d*),\s(\d)*,(\s\d*)\)\s\dpx\s\dpx\s\dpx\s\dpx/g;
+        var boxShadowsArray = boxShadows.match(boxShadowRegex);
+        var dancerBoxShadow = boxShadowsArray[currDancerID - 1];
+        if (dancerBoxShadow.match(/rgb\(0,\s0,\s0\)/) != null) { // black check
+            dancerBoxShadow = dancerBoxShadow.replace(/rgb\((\d*),\s(\d*),\s(\d*)\)/, color);
+        } else {
+            dancerBoxShadow = dancerBoxShadow.replace(/rgb\((\d*),\s(\d*),\s(\d*)\)/, 'black');
+        }
+        boxShadowsArray[currDancerID - 1] = dancerBoxShadow;
+        $(this).css("box-shadow", boxShadowsArray.join(','));
+
         // If the effort hasn't been clicked
         if ($(this).data("clicked") == 0) {
-
-            // Check if the max number of efforts has already been chosen
+            // Check if a dancer has been selected
             if (!currDancerID || !currentAnswer.DancerEfforts[currDancerID]) {
                 showDangerAlert("Pick a dancer first!");
                 return;
             }
 
+            // Check if the max number of efforts has already been chosen
             if (currentAnswer.DancerEfforts[currDancerID].length != numEfforts) {
-                var color = COLORS[(currDancerID - 1) % COLORS.length];
-
-                // Add border
-                var boxShadows = $(this).css("box-shadow");
-                var boxShadowRegex = /rgb\((\d*),\s(\d)*,(\s\d*)\)\s\dpx\s\dpx\s\dpx\s\dpx/g;
-                var boxShadowsArray = boxShadows.match(boxShadowRegex);
-                var dancerBoxShadow = boxShadowsArray[currDancerID - 1];
-                dancerBoxShadow = dancerBoxShadow.replace(/rgb\((\d*),\s(\d*),\s(\d*)\)/, color);
-                boxShadowsArray[currDancerID - 1] = dancerBoxShadow;
-                $(this).css("box-shadow", boxShadowsArray.join(','));
-            
                 // Add answer to the dictionary if it's not already there
                 if (jQuery.inArray(answer, currentAnswer.DancerEfforts[currDancerID]) === -1) {
                     currentAnswer.DancerEfforts[currDancerID].push(answer);
@@ -203,23 +194,11 @@ $(document).ready(function() {
                 
                 // check clicked
                 $(this).data("clicked", 1);
-            }
-            else {
+            } else {
                 showDangerAlert("You have checked " + numEfforts + " efforts already");
                 return;
             }
-        }
-        // If effort already clicked, unclick it
-        else {
-            // Remove border
-            var boxShadows = $(this).css("box-shadow");
-            var boxShadowRegex = /rgb\((\d*),\s(\d)*,(\s\d*)\)\s\dpx\s\dpx\s\dpx\s\dpx/g;
-            var boxShadowsArray = boxShadows.match(boxShadowRegex);
-            var dancerBoxShadow = boxShadowsArray[currDancerID - 1];
-            dancerBoxShadow = dancerBoxShadow.replace(/rgb\((\d*),\s(\d*),\s(\d*)\)/, "black");
-            boxShadowsArray[currDancerID - 1] = dancerBoxShadow;
-            $(this).css("box-shadow", boxShadowsArray.join(','));
-            
+        } else {
             // Remove from the answer
             var index = currentAnswer.DancerEfforts[currDancerID].indexOf(answer);
             currentAnswer.DancerEfforts[currDancerID].splice(index, 1);
@@ -239,7 +218,7 @@ $(document).ready(function() {
         data.PreviousAnswer = previousAnswer;
         console.log(data);
         socket.emit(ClientMessage.QuizAnswer, data);
-        // Make a deep copy of the current answer as previous
+        // Make a deep copy of the current answer, save it as previous
         previousAnswer = jQuery.extend(true, {}, currentAnswer);
     });   
 
