@@ -155,7 +155,7 @@ io.sockets.on('connection', function (socket) {
       SCORE_DELTAS[data.Team] = scoreChange;
       console.log('Score Deltas: ');   
       console.log(SCORE_DELTAS);
-      
+
       if(SCORE_CLIENT_SOCKET_UIUC) {
         console.log('server: Illinois Score emit');
         for(var i=0; i<SCORE_CLIENT_SOCKET_UIUC.length; i++) {
@@ -264,18 +264,4 @@ function sendLevelUpdates() {
     "TotalDancers" : LEVEL_SETTING.TotalDancers,
     "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
   });
-}
-
-// var levelUpInterval = setInterval(function () {
-//   if (ACTIVE_LEVEL < LEVEL_SETTINGS.length - 1) {
-//     ACTIVE_LEVEL++;
-//     LEVEL_SETTING = LEVEL_SETTINGS[ACTIVE_LEVEL];
-//     console.log(LEVEL_SETTING);
-//     console.log('server: sending level setting');
-//     io.sockets.emit(ServerMessage.LevelSetting, { 
-//       "Level" : ACTIVE_LEVEL,
-//       "TotalDancers" : LEVEL_SETTING.TotalDancers,
-//       "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
-//     });
-//   }
-// }, 15000);
+};

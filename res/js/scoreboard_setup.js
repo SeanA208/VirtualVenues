@@ -1,5 +1,5 @@
 // Connect to the server
-var LOCAL_DEBUG = false; 
+var LOCAL_DEBUG = true; 
 var HOST = LOCAL_DEBUG ? 
 	'localhost' : 
 	'ec2-54-83-22-126.compute-1.amazonaws.com';
@@ -44,17 +44,6 @@ $(document).ready(function() {
 		"background-color", "black"
 	);
 
-	// Notify the server you're the scoreboard
-	if(!getCookieValue('team')) {
-		var teamValue = confirm('Are you illinois?');
-		if (teamValue == true) {
-			writeSessionCookie('team', 'illinois');
-		}
-		else {
-			writeSessionCookie('team', 'irvine');
-		}
-	}
-
 	// Get team name from the url
 	var parametersString = window.location.search.substr(1);
 	var parameters = {};
@@ -63,6 +52,7 @@ $(document).ready(function() {
         var tmparr = parametersArray[i].split("=");
         parameters[tmparr[0]] = tmparr[1];
     }
+    CURRENT_TEAM = parameters.team;
 	socket.emit(ScoreClientMessage.Connection, {'Team' : parameters.team });
 
 	socket.on(ServerMessage.ActiveLevel, function (data) {
@@ -108,7 +98,7 @@ $(document).ready(function() {
 				NEW_SCORES[i] = (EFFORT_SCORES[i] < 0 ? 0 : EFFORT_SCORES[i]);
 			}
 			console.log("new histogram values");
-			if(getCookieValue('team') == data.Team) {
+			if (CURRENT_TEAM == data.Team) {
 				console.log("YEP! They are the same");
 				graph.update(NEW_SCORES);
 				console.log(NEW_SCORES);
