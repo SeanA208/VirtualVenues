@@ -22,7 +22,7 @@ var ScoreClientMessage = {
 var ACTIVE_LEVEL = 0;
 var SCORES = {"illinois" : 0, "irvine" : 0};
 var EFFORT_SCORES = [0, 0, 0, 0, 0, 0, 0, 0];
-var CURRENT_TEAM = null;
+var CURRENT_TEAM = "illinois";
 
 $(document).ready(function() {
 	var ctx = $("#bar_canvas")[0].getContext("2d");
@@ -44,6 +44,17 @@ $(document).ready(function() {
 		"background-color", "black"
 	);
 
+	// Notify the server you're the scoreboard
+	if(!getCookieValue('team')) {
+		var teamValue = confirm('Are you illinois?');
+		if (teamValue == true) {
+			writeSessionCookie('team', 'illinois');
+		}
+		else {
+			writeSessionCookie('team', 'irvine');
+		}
+	}
+
 	// Get team name from the url
 	var parametersString = window.location.search.substr(1);
 	var parameters = {};
@@ -52,8 +63,6 @@ $(document).ready(function() {
         var tmparr = parametersArray[i].split("=");
         parameters[tmparr[0]] = tmparr[1];
     }
-    console.log("Team name - " + parameters.team);
-    CURRENT_TEAM = parameters.team;
 	socket.emit(ScoreClientMessage.Connection, {'Team' : parameters.team });
 
 	socket.on(ServerMessage.ActiveLevel, function (data) {
@@ -88,7 +97,6 @@ $(document).ready(function() {
 	socket.on(ScoreClientMessage.HistogramDeltas, function (data) {
 		console.log('scoreboard: histogram deltas message');
 		console.log(data.Deltas);
-		console.log(data);
 
 		if (!data.Deltas || !data.Deltas.length) {
 			return;
@@ -99,9 +107,15 @@ $(document).ready(function() {
 				EFFORT_SCORES[i] += data.Deltas[i];
 				NEW_SCORES[i] = (EFFORT_SCORES[i] < 0 ? 0 : EFFORT_SCORES[i]);
 			}
-			graph.update(NEW_SCORES);
 			console.log("new histogram values");
-			console.log(NEW_SCORES);
+			if(getCookieValue('team') == data.Team) {
+				console.log("YEP! They are the same");
+				graph.update(NEW_SCORES);
+				console.log(NEW_SCORES);
+			}
+			else{
+				console.log("Sorry they are not equal");
+			}
 		}
 	});
 });	

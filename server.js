@@ -11,8 +11,9 @@ var express = require('express')
 // State variables
 var SCORE_DELTAS = {"illinois" : 0, "irvine" : 0};
 var HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];
-var SCORE_CLIENT_SOCKET_UIUC = null;
-var SCORE_CLIENT_SOCKET_IRVINE = null;
+var SCORE_CLIENT_SOCKET_UIUC = new Array();
+var SCORE_CLIENT_SOCKET_IRVINE = new Array();
+var ADMIN_SOCKET = null;
 var ACTIVE_LEVEL = 0;
 var LEVEL_SETTING = {
   "TotalDancers" : 2,
@@ -48,6 +49,11 @@ var ScoreClientMessage = {
   ScoreDeltas : "scoredeltas",
   EffortDeltas : "effortdeltas" 
 };
+
+var AdminClientMessage = {
+  Connection : "adminconnection",
+  ChangeLevel : "adminchangelevel"
+}
 
 // Used ports and IP addresses
 var HTTP_PORT = 8080
@@ -134,11 +140,11 @@ io.sockets.on('connection', function (socket) {
       return;
     }
 
-    if (data.Team == 'illinois' && !SCORE_CLIENT_SOCKET_UIUC) {
+    if (data.Team == 'illinois' && SCORE_CLIENT_SOCKET_UIUC.length == 0) {
       console.log ("\t score client not connected for UIUC");
       return;
     }
-    else if(data.Team == 'irvine' && !SCORE_CLIENT_SOCKET_IRVINE ) {
+    else if(data.Team == 'irvine' && !SCORE_CLIENT_SOCKET_IRVINE.length == 0 ) {
       console.log ("\t score client not connected for Irvine");
       return;
     }
@@ -151,17 +157,21 @@ io.sockets.on('connection', function (socket) {
       SCORE_DELTAS[data.Team] = scoreChange;
       console.log('Score Deltas: ');   
       console.log(SCORE_DELTAS);
-      if (SCORE_CLIENT_SOCKET_UIUC) 
+      if(data.Team == 'illinois' && SCORE_CLIENT_SOCKET_UIUC.length > 0) 
       {
         console.log('server: Illinois Score emit');
-        SCORE_CLIENT_SOCKET_UIUC.emit(ScoreClientMessage.ScoreDeltas, 
+        for(var i=0; i<SCORE_CLIENT_SOCKET_UIUC.length; i++) {
+          SCORE_CLIENT_SOCKET_UIUC[i].emit(ScoreClientMessage.ScoreDeltas, 
           { "Deltas" : SCORE_DELTAS }); 
+        }
       }
-      else if(SCORE_CLIENT_SOCKET_IRVINE )
+      else if( data.Team == 'irvine' && SCORE_CLIENT_SOCKET_IRVINE.length > 0 )
       {
         console.log('server: irvine Score emit');
-        SCORE_CLIENT_SOCKET_IRVINE.emit(ScoreClientMessage.ScoreDeltas, 
+        for (var i = 0; i <SCORE_CLIENT_SOCKET_IRVINE.length; i++) {
+          SCORE_CLIENT_SOCKET_IRVINE[i].emit(ScoreClientMessage.ScoreDeltas, 
           { "Deltas" : SCORE_DELTAS });
+        }
       }  
     }
 
@@ -182,16 +192,20 @@ io.sockets.on('connection', function (socket) {
       console.log('\t no previous answer');
     }
     
-    if (data.Team == 'illinois' && SCORE_CLIENT_SOCKET_UIUC){
+    if (data.Team == 'illinois' && SCORE_CLIENT_SOCKET_UIUC.length > 0 ){
       console.log('UIUC HistogramDeltas');
       console.log(HISTOGRAM_DELTAS);
-      SCORE_CLIENT_SOCKET_UIUC.emit(ScoreClientMessage.HistogramDeltas, { "Deltas" : HISTOGRAM_DELTAS, "Team": data.Team });
+      for ( var i=0; i < SCORE_CLIENT_SOCKET_UIUC.length; i++ ) {
+        SCORE_CLIENT_SOCKET_UIUC[i].emit(ScoreClientMessage.HistogramDeltas, { "Deltas" : HISTOGRAM_DELTAS, "Team": data.Team });
+      }
       HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];  
     }
-    else if (data.Team == 'irvine' && SCORE_CLIENT_SOCKET_IRVINE){
+    else if (data.Team == 'irvine' && SCORE_CLIENT_SOCKET_IRVINE.length > 0){
       console.log('Irvine HistogramDeltas');
       console.log(HISTOGRAM_DELTAS);
-      SCORE_CLIENT_SOCKET_IRVINE.emit(ScoreClientMessage.HistogramDeltas, { "Deltas" : HISTOGRAM_DELTAS, "Team": data.Team });
+      for( var i=0; i < SCORE_CLIENT_SOCKET_IRVINE.length; i++ ) {
+        SCORE_CLIENT_SOCKET_IRVINE[i].emit(ScoreClientMessage.HistogramDeltas, { "Deltas" : HISTOGRAM_DELTAS, "Team": data.Team });
+      }
       HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];  
     }
   });
@@ -202,25 +216,68 @@ io.sockets.on('connection', function (socket) {
     if (data.Team == 'illinois')
     {
       console.log("server: score client set for UIUC");
-      SCORE_CLIENT_SOCKET_UIUC = socket;
+      SCORE_CLIENT_SOCKET_UIUC.push(socket);
     }
     else if (data.Team == 'irvine') {
       console.log("server: score client set for Irvine");
-      SCORE_CLIENT_SOCKET_IRVINE = socket;
+      SCORE_CLIENT_SOCKET_IRVINE.push(socket);
     }
   });
+  socket.on('disconnect', function() {
+    console.log('disconnect!!!');
+    for (var indexNum = SCORE_CLIENT_SOCKET_UIUC.length - 1; indexNum >= 0; indexNum--) 
+    {
+      if ( SCORE_CLIENT_SOCKET_UIUC[indexNum] === socket ) {
+        console.log('disconnect for UIUC scoreboard');
+        SCORE_CLIENT_SOCKET_UIUC.splice(indexNum, 1);
+      }
+    }
+    for (var indexNum = SCORE_CLIENT_SOCKET_IRVINE.length - 1; indexNum >= 0; indexNum--) 
+    {
+      if ( SCORE_CLIENT_SOCKET_IRVINE[indexNum] === socket ) {
+        console.log('disconnect for irvine scoreboard');
+        SCORE_CLIENT_SOCKET_IRVINE.splice(indexNum, 1);
+      }
+    }
+  });
+  // Admin Client Handlers
+  socket.on(AdminClientMessage.Connection, function() {
+    console.log("server: admin client connected");
+    ADMIN_SOCKET = socket;
+  });
+
+  socket.on(AdminClientMessage.ChangeLevel, function(data) {
+    console.log("server: admin supplying new level information");
+    if (data.level)
+      ACTIVE_LEVEL = data.level;
+    if (data.totalDancers)
+      LEVEL_SETTING.TotalDancers = data.totalDancers;
+    if (data.effortsPerDancer)
+      LEVEL_SETTING.EffortsPerDancer = data.effortsPerDancer;
+
+    sendLevelUpdates();
+  })
 });
 
-var levelUpInterval = setInterval(function () {
-  if (ACTIVE_LEVEL < LEVEL_SETTINGS.length - 1) {
-    ACTIVE_LEVEL++;
-    LEVEL_SETTING = LEVEL_SETTINGS[ACTIVE_LEVEL];
-    console.log(LEVEL_SETTING);
-    console.log('server: sending level setting');
-    io.sockets.emit(ServerMessage.LevelSetting, { 
-      "Level" : ACTIVE_LEVEL,
-      "TotalDancers" : LEVEL_SETTING.TotalDancers,
-      "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
-    });
-  }
-}, 15000);
+function sendLevelUpdates() {
+  console.log('server: sending level setting with level ' + ACTIVE_LEVEL);
+  io.sockets.emit(ServerMessage.LevelSetting, { 
+    "Level" : ACTIVE_LEVEL,
+    "TotalDancers" : LEVEL_SETTING.TotalDancers,
+    "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
+  });
+}
+
+// var levelUpInterval = setInterval(function () {
+//   if (ACTIVE_LEVEL < LEVEL_SETTINGS.length - 1) {
+//     ACTIVE_LEVEL++;
+//     LEVEL_SETTING = LEVEL_SETTINGS[ACTIVE_LEVEL];
+//     console.log(LEVEL_SETTING);
+//     console.log('server: sending level setting');
+//     io.sockets.emit(ServerMessage.LevelSetting, { 
+//       "Level" : ACTIVE_LEVEL,
+//       "TotalDancers" : LEVEL_SETTING.TotalDancers,
+//       "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
+//     });
+//   }
+// }, 15000);
