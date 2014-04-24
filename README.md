@@ -12,29 +12,33 @@ sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
 TODO
 -----
 
-### Server
-	* Proper scoring mechanism
+### Server [Sean + Neel]
+	* Make sure scoring works as intended 
 		* Team scoring + Effort scoring
-	* Aggregate scoring on the server -- storage
-		* Replay 
-	* Level changing mechanics // Manual Level Changing
+	* Aggregate scoring on the server
+		* Storage mechanism per level, per team, per effort
+		* Level changing mechanics
+			* Clearing state on mobile and clearing histogram
+		* Replay on histogram
 	
-### Admin
+### Admin [Sean]
 	* Better admin panel
 
-### Scoreboard
-	* Kaleidoscope cuts of bars
+### Scoreboard [Ashwin + Timur]
+	* Kaleidoscope resizing
+	* Styling + Position (relative)
+		* For portrait AND landscape
 
-### Mobile
-	* Better buttons
-	* Bigger text
-	* Clear button
-	* Wide text
-	* Highlight selected dancer
-	* Save state on mobile screen
+### Mobile -- [Jatin + Madina]
+	* Better buttons 
+	* Bigger text 
+	* Clear button 
+	* Wide text 
+	* Highlight selected dancer 
+	* Save state on mobile screen 
 		* Popup alert
 	* Clear on new level
-	* (low priority) Store answers per level in cookies
+	* (low priority) Store answers per level in cookies 
 
 
 
