@@ -129,9 +129,6 @@ function loadDancerButtons(num) {
 };
 
 function showDangerAlert(text){
-    bootbox.alert(text, function(){
-        console.log("alert callback")
-    });
     $("#alertTextID").text(text);
     $(".alert").show();
 };
