@@ -212,16 +212,16 @@ io.sockets.on('connection', function (socket) {
   });
 });
 
-var levelUpInterval = setInterval(function () {
-  if (ACTIVE_LEVEL < LEVEL_SETTINGS.length - 1) {
-    ACTIVE_LEVEL++;
-    LEVEL_SETTING = LEVEL_SETTINGS[ACTIVE_LEVEL];
-    console.log(LEVEL_SETTING);
-    console.log('server: sending level setting');
-    io.sockets.emit(ServerMessage.LevelSetting, { 
-      "Level" : ACTIVE_LEVEL,
-      "TotalDancers" : LEVEL_SETTING.TotalDancers,
-      "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
-    });
-  }
-}, 15000);
+// var levelUpInterval = setInterval(function () {
+//   if (ACTIVE_LEVEL < LEVEL_SETTINGS.length - 1) {
+//     ACTIVE_LEVEL++;
+//     LEVEL_SETTING = LEVEL_SETTINGS[ACTIVE_LEVEL];
+//     console.log(LEVEL_SETTING);
+//     console.log('server: sending level setting');
+//     io.sockets.emit(ServerMessage.LevelSetting, { 
+//       "Level" : ACTIVE_LEVEL,
+//       "TotalDancers" : LEVEL_SETTING.TotalDancers,
+//       "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
+//     });
+//   }
+// }, 15000);
