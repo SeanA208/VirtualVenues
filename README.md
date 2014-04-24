@@ -20,6 +20,8 @@ TODO
 		* Level changing mechanics
 			* Clearing state on mobile and clearing histogram
 		* Replay on histogram
+	* Check against proper answers
+		* Stored in text file
 	
 ### Admin [Sean]
 	* Better admin panel
