@@ -101,13 +101,11 @@ function getScoreChange(answer) {
           console.log("\t Effort: " + effortId);
           if (LEVEL_SETTING.DancerEfforts[dancerId].indexOf(parseInt(effortId)) > -1) {
             count += 1;
-          }
-          else {
+          } else {
             console.log("\t Incorrect effort guess: " + effortId); 
           }
         }
-      }
-      else {
+      } else {
         console.log("\t Dancer not in current level: " + dancerId);
       }
     }
@@ -157,21 +155,16 @@ io.sockets.on('connection', function (socket) {
       SCORE_DELTAS[data.Team] = scoreChange;
       console.log('Score Deltas: ');   
       console.log(SCORE_DELTAS);
-      if(data.Team == 'illinois' && SCORE_CLIENT_SOCKET_UIUC.length > 0) 
-      {
+      
+      if(SCORE_CLIENT_SOCKET_UIUC) {
         console.log('server: Illinois Score emit');
         for(var i=0; i<SCORE_CLIENT_SOCKET_UIUC.length; i++) {
           SCORE_CLIENT_SOCKET_UIUC[i].emit(ScoreClientMessage.ScoreDeltas, 
           { "Deltas" : SCORE_DELTAS }); 
         }
       }
-<<<<<<< HEAD
       
-      if(SCORE_CLIENT_SOCKET_IRVINE )
-=======
-      else if( data.Team == 'irvine' && SCORE_CLIENT_SOCKET_IRVINE.length > 0 )
->>>>>>> 49db2e967d8a25dc2bc3d89c3ec6ae2fd6e4a62e
-      {
+      if(SCORE_CLIENT_SOCKET_IRVINE ) {
         console.log('server: irvine Score emit');
         for (var i = 0; i <SCORE_CLIENT_SOCKET_IRVINE.length; i++) {
           SCORE_CLIENT_SOCKET_IRVINE[i].emit(ScoreClientMessage.ScoreDeltas, 
