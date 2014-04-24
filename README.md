@@ -29,7 +29,7 @@ TODO
 	* Styling + Position (relative)
 		* For portrait AND landscape
 
-### Mobile -- [Jatin + Madina]
+### Mobile [Jatin + Madina]
 	* Better buttons 
 	* Bigger text 
 	* Clear button 
