@@ -8,7 +8,7 @@
  */
 var LOCAL_DEBUG = false;
 var HOST =  LOCAL_DEBUG ?
-    'localhost' :
+    '172.16.234.185' :
     'ec2-54-83-22-126.compute-1.amazonaws.com';
 var socket = io.connect(HOST);
 var teamName = null; 
@@ -23,7 +23,7 @@ var currentAnswer = {
     "DancerEfforts" : {}
 };
 var previousAnswer = null;
-var COLORS = ["crimson", "indigo", "yellowgreen", "teal", "salmon", "plum", "lavender", "aqua"];
+var COLORS = ["crimson", "yellowgreen", "indigo", "teal", "salmon", "plum", "lavender", "aqua"];
 
 // State Variables
 var LEVEL_SETTING = null;
@@ -95,13 +95,19 @@ function loadDancerButtons(num) {
         currentAnswer.DancerEfforts[i] = [];
         
         // Generate black box around each effort for each dancer
-        boxShadows.push("black 0px 0px 0px " + (2 * i) + "px");
+        if (i == num) {
+            boxShadows.push("black 0px 0px 0px " + (2 * i) + "px");
+        }
+        else {
+            boxShadows.push("black 0px 0px 0px " + (2 * i) + "px");
+        }
     }
 
     // Set up the black boxes for all efforts
     $(".effort").css({
         "box-shadow" : boxShadows.join(),
-        'margin' : (num * 2) + "px"
+        'margin' : (num * 2) + "px",
+        "border-radius": "10px"
     });
 
     // Set the button dancer click handlers
