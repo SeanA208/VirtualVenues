@@ -23,7 +23,7 @@ var currentAnswer = {
     "DancerEfforts" : {}
 };
 var previousAnswer = null;
-var COLORS = ["crimson", "indigo", "yellowgreen", "teal", "salmon", "plum", "lavender", "aqua"];
+var COLORS = ["crimson", "yellowgreen", "indigo", "teal", "salmon", "plum", "lavender", "aqua"];
 
 // State Variables
 var LEVEL_SETTING = null;
@@ -55,7 +55,7 @@ socket.on(ServerMessage.LevelSetting, function (data) {
         "font-size" : "medium"
     });
     cleanUpEfforts();
-    loadDancerButtons(numDancers);
+    loadDancerButtons();
 });
 
 socket.on(ServerMessage.Quiz, function (data) {
@@ -68,8 +68,7 @@ function cleanUpEfforts(){
         $(this).data("clicked", 0);        
     });
 }
-
-function loadDancerButtons(num) {
+function loadDancerButtons() {
     // Clear all previous dancer buttons
     $("#dancerbar").empty();
 
@@ -82,9 +81,9 @@ function loadDancerButtons(num) {
     // Apend an appropriate number of dancer buttons for this level
     // Start an empty list of effort guesses for each dancer
     var boxShadows = [];
-    for (i = 1; i <= num; i += 1) {
+    for (i = 1; i <= numDancers; i += 1) {
         $("#dancerbar").append(
-            "<a class =\"btn btn-primary\" data-clicked=0 role=\"button\"" +
+            "<a class =\"btn btn-warning\" data-clicked=0 role=\"button\"" +
                 "id=\"" + i + "\">" + i + 
             "</a>"
         );
@@ -102,11 +101,12 @@ function loadDancerButtons(num) {
     // Set up the black boxes for all efforts
     $(".effort").css({
         "box-shadow" : boxShadows.join(),
-        'margin' : (num * 2) + "px"
+        'margin' : (numDancers * 2) + "px",
+        "border-radius": "10px"
     });
 
     // Set the button dancer click handlers
-    $(".btn-primary").click(function() {
+    $(".btn-warning").click(function() {
         // Get the ID of the clicked dancer
         currDancerID = parseInt($(this).attr("id"));
 
@@ -117,11 +117,15 @@ function loadDancerButtons(num) {
             // Deactivate previous dancer button
             if(previousDancer != null){
                 previousDancer.removeClass('active');
+                //previousDancer.css("font-size", "100%")
                 previousDancer.data('clicked', 0);
+                previousDancer.css("border", "none");
             }
 
             // Activate the button for the current dancer
             $(this).addClass('active');
+            $(this).css("border", "2px white solid");
+          
             $(this).data('clicked', 1);
             previousDancer = $(this);
         }
@@ -129,11 +133,11 @@ function loadDancerButtons(num) {
 };
 
 function showDangerAlert(text){
-    bootbox.alert(text, function(){
-        console.log("alert callback")
-    });
-    $("#alertTextID").text(text);
-    $(".alert").show();
+    $("#modal-alert").text(text);
+    $('#alertModal').modal('show');
+    console.log("Calling from mobile.js");
+    setTimeout(function(){$('#alertModal').modal('hide')},1000);
+
 };
 
 $(document).ready(function() {
@@ -190,6 +194,7 @@ $(document).ready(function() {
                 return;
             }
         } else {
+            
             dancerBoxShadow = dancerBoxShadow.replace(/rgb\((\d*),\s(\d*),\s(\d*)\)/, 'black');
             var index = currentAnswer.DancerEfforts[currDancerID].indexOf(answer);
             currentAnswer.DancerEfforts[currDancerID].splice(index, 1);
@@ -212,7 +217,13 @@ $(document).ready(function() {
         previousAnswer = jQuery.extend(true, {}, currentAnswer);
     });   
 
-    $(".close").click(function(){
-        $(".alert").hide();
+    //User wants to reset his current answer
+    $("#clear").click(function(){
+        console.log("Cleaning up");
+        currentAnswer.DancerEfforts = {};
+        loadDancerButtons();
+        console.log("DancerEfforts: "+currentAnswer.DancerEfforts+"Level: "+currentAnswer.Level);
     });
+    
+
 });
