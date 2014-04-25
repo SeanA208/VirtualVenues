@@ -8,7 +8,7 @@
  */
 var LOCAL_DEBUG = false;
 var HOST =  LOCAL_DEBUG ?
-    '172.16.234.185' :
+    'localhost' :
     'ec2-54-83-22-126.compute-1.amazonaws.com';
 var socket = io.connect(HOST);
 var teamName = null; 
@@ -55,7 +55,7 @@ socket.on(ServerMessage.LevelSetting, function (data) {
         "font-size" : "medium"
     });
     cleanUpEfforts();
-    loadDancerButtons(numDancers);
+    loadDancerButtons();
 });
 
 socket.on(ServerMessage.Quiz, function (data) {
@@ -68,7 +68,7 @@ function cleanUpEfforts(){
         $(this).data("clicked", 0);        
     });
 }
-function loadDancerButtons(num) {
+function loadDancerButtons() {
     // Clear all previous dancer buttons
     $("#dancerbar").empty();
 
@@ -81,7 +81,7 @@ function loadDancerButtons(num) {
     // Apend an appropriate number of dancer buttons for this level
     // Start an empty list of effort guesses for each dancer
     var boxShadows = [];
-    for (i = 1; i <= num; i += 1) {
+    for (i = 1; i <= numDancers; i += 1) {
         $("#dancerbar").append(
             "<a class =\"btn btn-warning\" data-clicked=0 role=\"button\"" +
                 "id=\"" + i + "\">" + i + 
@@ -95,18 +95,13 @@ function loadDancerButtons(num) {
         currentAnswer.DancerEfforts[i] = [];
         
         // Generate black box around each effort for each dancer
-        if (i == num) {
-            boxShadows.push("black 0px 0px 0px " + (2 * i) + "px");
-        }
-        else {
-            boxShadows.push("black 0px 0px 0px " + (2 * i) + "px");
-        }
+        boxShadows.push("black 0px 0px 0px " + (2 * i) + "px");
     }
 
     // Set up the black boxes for all efforts
     $(".effort").css({
         "box-shadow" : boxShadows.join(),
-        'margin' : (num * 2) + "px",
+        'margin' : (numDancers * 2) + "px",
         "border-radius": "10px"
     });
 
@@ -196,6 +191,7 @@ $(document).ready(function() {
                 return;
             }
         } else {
+            
             dancerBoxShadow = dancerBoxShadow.replace(/rgb\((\d*),\s(\d*),\s(\d*)\)/, 'black');
             var index = currentAnswer.DancerEfforts[currDancerID].indexOf(answer);
             currentAnswer.DancerEfforts[currDancerID].splice(index, 1);
@@ -221,8 +217,8 @@ $(document).ready(function() {
     //User wants to reset his current answer
     $("#clear").click(function(){
         console.log("Cleaning up");
-        cleanUpEfforts();
         currentAnswer.DancerEfforts = {};
+        loadDancerButtons();
         console.log("DancerEfforts: "+currentAnswer.DancerEfforts+"Level: "+currentAnswer.Level);
     });
     
