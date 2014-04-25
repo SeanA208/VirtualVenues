@@ -124,10 +124,12 @@ function loadDancerButtons(num) {
                 previousDancer.removeClass('active');
                 //previousDancer.css("font-size", "100%")
                 previousDancer.data('clicked', 0);
+                previousDancer.css("border", "none");
             }
 
             // Activate the button for the current dancer
             $(this).addClass('active');
+            $(this).css("border", "2px white solid");
           
             $(this).data('clicked', 1);
             previousDancer = $(this);
@@ -136,8 +138,9 @@ function loadDancerButtons(num) {
 };
 
 function showDangerAlert(text){
-    $("#alertTextID").text(text);
-    $('#alertModal').modal('show')
+    $("#modal-alert").text(text);
+    $('#alertModal').modal('show');
+    console.log("Calling from mobile.js");
     setTimeout(function(){$('#alertModal').modal('hide')},1000);
 
 };
