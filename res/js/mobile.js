@@ -68,7 +68,6 @@ function cleanUpEfforts(){
         $(this).data("clicked", 0);        
     });
 }
-
 function loadDancerButtons(num) {
     // Clear all previous dancer buttons
     $("#dancerbar").empty();
@@ -84,7 +83,7 @@ function loadDancerButtons(num) {
     var boxShadows = [];
     for (i = 1; i <= num; i += 1) {
         $("#dancerbar").append(
-            "<a class =\"btn btn-primary\" data-clicked=0 role=\"button\"" +
+            "<a class =\"btn btn-warning\" data-clicked=0 role=\"button\"" +
                 "id=\"" + i + "\">" + i + 
             "</a>"
         );
@@ -106,7 +105,7 @@ function loadDancerButtons(num) {
     });
 
     // Set the button dancer click handlers
-    $(".btn-primary").click(function() {
+    $(".btn-warning").click(function() {
         // Get the ID of the clicked dancer
         currDancerID = parseInt($(this).attr("id"));
 
@@ -117,11 +116,13 @@ function loadDancerButtons(num) {
             // Deactivate previous dancer button
             if(previousDancer != null){
                 previousDancer.removeClass('active');
+                //previousDancer.css("font-size", "100%")
                 previousDancer.data('clicked', 0);
             }
 
             // Activate the button for the current dancer
             $(this).addClass('active');
+          
             $(this).data('clicked', 1);
             previousDancer = $(this);
         }
@@ -130,7 +131,9 @@ function loadDancerButtons(num) {
 
 function showDangerAlert(text){
     $("#alertTextID").text(text);
-    $(".alert").show();
+    $('#alertModal').modal('show')
+    setTimeout(function(){$('#alertModal').modal('hide')},1000);
+
 };
 
 $(document).ready(function() {
@@ -209,7 +212,13 @@ $(document).ready(function() {
         previousAnswer = jQuery.extend(true, {}, currentAnswer);
     });   
 
-    $(".close").click(function(){
-        $(".alert").hide();
+    //User wants to reset his current answer
+    $("#clear").click(function(){
+        console.log("Cleaning up");
+        cleanUpEfforts();
+        currentAnswer.DancerEfforts = {};
+        console.log("DancerEfforts: "+currentAnswer.DancerEfforts+"Level: "+currentAnswer.Level);
     });
+    
+
 });

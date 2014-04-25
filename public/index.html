@@ -33,6 +33,15 @@
     </head>
     
     <body>
+        <div class="modal fade" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="smallModal" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-body">
+                    <h3>Modal Body</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
 		<div id="content">
             <!-- Team picking UI -->
 			<div id="teaminfo" align="center" vertical-align="middle">
@@ -57,7 +66,6 @@
                     <h2 style="text-align: center;" id="titleinfo"></h2> 
                     <!-- alert -->
                     <div class="alert alert-danger alert-dismissable" style="display:none">
-                        <button type="button" class="close">&times;</button>
                         <h4 id = "alertTextID"></h4>
                     </div>   
                     <!-- laban effort buttons -->
@@ -93,8 +101,12 @@
                             <img src="/res/images/laban_effort_shape/wring-word-colored.jpg" class="effort" effortid="7" data-clicked=0>
                         </div>
                     </div>               
-		    	</div>
-                <br><button type="button" class="btn btn-success" data-toggle="button" id="sendInfo">SUBMIT</button><br>
+                
+                <br>
+		    	<button type="button" class="btn btn-success" data-toggle="button" id="sendInfo">SUBMIT</button>
+                <button type="button" class="btn btn-primary" data-toggle="button" id="clear">CLEAR</button>
+                <br>
+                </div>
 			</div>
 		</div>
     </body>
