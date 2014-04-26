@@ -221,6 +221,7 @@ io.sockets.on('connection', function (socket) {
       SCORE_CLIENT_SOCKET_IRVINE.push(socket);
     }
   });
+
   socket.on('disconnect', function() {
     console.log('disconnect!!!');
     for (var indexNum = SCORE_CLIENT_SOCKET_UIUC.length - 1; indexNum >= 0; indexNum--) 
@@ -238,6 +239,7 @@ io.sockets.on('connection', function (socket) {
       }
     }
   });
+  
   // Admin Client Handlers
   socket.on(AdminClientMessage.Connection, function() {
     console.log("server: admin client connected");
