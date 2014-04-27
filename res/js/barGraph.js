@@ -139,15 +139,15 @@ function BarGraph(ctx) {
 		}
 
 		// Write bar value
-		ctx.fillStyle = "#eee";
-		ctx.font = "bold 20px sans-serif";
-		ctx.textAlign = "center";
-		// Use try / catch to stop IE 8 from going to error town
-		try {
-		  ctx.fillText(Math.round(arr[i]),
-			i * that.width / numOfBars + (that.width / numOfBars) / 2,
-			graphAreaHeight - barHeight - 10);
-		} catch (ex) {}
+		// ctx.fillStyle = "#eee";
+		// ctx.font = "bold 20px sans-serif";
+		// ctx.textAlign = "center";
+		// // Use try / catch to stop IE 8 from going to error town
+		// try {
+		//   ctx.fillText(Math.round(arr[i]),
+		// 	i * that.width / numOfBars + (that.width / numOfBars) / 2,
+		// 	graphAreaHeight - barHeight - 10);
+		// } catch (ex) {}
 		// Draw bar label if it exists
 		if (that.xAxisLabelArr[i]) {					
 		  // Use try / catch to stop IE 8 from going to error town				
@@ -165,8 +165,8 @@ function BarGraph(ctx) {
 
   // Public properties and methods
 	
-  this.width = 300;
-  this.height = 150;	
+  this.width;
+  this.height;	
   this.maxValue;
   this.margin = 5;
   this.colors = ["purple", "red", "green", "yellow"];
