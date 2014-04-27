@@ -194,7 +194,7 @@ function draw_dot(x,y) {
 
 function resize() {	
 	canvas_w=get_screen_size()[0];
-	canvas_h=get_screen_size()[1] * 4 / 5;
+	canvas_h=get_screen_size()[1] * 3 / 4;
 	init();
 }	
 
@@ -220,8 +220,8 @@ $(document).ready(function() {
 	
 	var graph = new BarGraph(ctx);
 	graph.width = get_screen_size()[0] / 2;
-	graph.height = get_screen_size()[1] / 5;
-	graph.maxValue = 10;
+	graph.height = get_screen_size()[1] / 4;
+	graph.maxValue = 100;
 	graph.margin = 2;
 	graph.colors = ["green", "red", "blue", "yellow"];
 
