@@ -22,7 +22,6 @@ var currentAnswer = {
     "Level" : null,
     "DancerEfforts" : {}
 };
-var previousAnswer = null;
 var COLORS = ["crimson", "yellowgreen", "indigo", "teal", "salmon", "plum", "lavender", "aqua"];
 
 // State Variables
@@ -54,7 +53,6 @@ socket.on(ServerMessage.LevelSetting, function (data) {
         //"font-family" : "Chicago, Verdana, sans-seriff",
         "font-size" : "medium"
     });
-    cleanUpEfforts();
     loadDancerButtons();
 });
 
@@ -62,12 +60,6 @@ socket.on(ServerMessage.Quiz, function (data) {
     console.log('client: quiz message');
 });
 
-function cleanUpEfforts(){
-    $(".effort").each(function() {
-        $(this).css("border", "none");
-        $(this).data("clicked", 0);        
-    });
-}
 function loadDancerButtons() {
     // Clear all previous dancer buttons
     $("#dancerbar").empty();
@@ -132,11 +124,11 @@ function loadDancerButtons() {
     });
 };
 
-function showDangerAlert(text){
+function showAlert(text){
     $("#modal-alert").text(text);
     $('#alertModal').modal('show');
     console.log("Calling from mobile.js");
-    setTimeout(function(){$('#alertModal').modal('hide')},1000);
+    setTimeout(function(){$('#alertModal').modal('hide')},1500);
 
 };
 
@@ -171,7 +163,7 @@ $(document).ready(function() {
 
         // Check if a dancer has been selected
         if (!currDancerID || !currentAnswer.DancerEfforts[currDancerID]) {
-            showDangerAlert("Pick a dancer first!");
+            showAlert("Pick a dancer first!");
             return;
         }
 
@@ -190,7 +182,7 @@ $(document).ready(function() {
                     currentAnswer.DancerEfforts[currDancerID].push(answer);
                 }
             } else { 
-                showDangerAlert("You have checked " + numEfforts + " efforts already");
+                showAlert("You have checked \n"+ numEfforts + " efforts already");
                 return;
             }
         } else {
@@ -221,6 +213,7 @@ $(document).ready(function() {
     $("#clear").click(function(){
         console.log("Cleaning up");
         currentAnswer.DancerEfforts = {};
+        currDancerID = null;
         loadDancerButtons();
         console.log("DancerEfforts: "+currentAnswer.DancerEfforts+"Level: "+currentAnswer.Level);
     });
