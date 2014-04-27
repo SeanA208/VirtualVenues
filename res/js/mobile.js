@@ -100,6 +100,7 @@ function loadDancerButtons() {
 
     // Set up the black boxes for all efforts
     $(".effort").css({
+        "border": "1px white solid",
         "box-shadow" : boxShadows.join(),
         'margin' : (numDancers * 2) + "px",
         "border-radius": "10px"
