@@ -8,7 +8,7 @@
  */
 var LOCAL_DEBUG = true;
 var HOST =  LOCAL_DEBUG ?
-    '172.16.184.182' :
+    'localhost' :
     'ec2-54-83-22-126.compute-1.amazonaws.com';
 var socket = io.connect(HOST);
 var teamName = null; 
@@ -182,7 +182,7 @@ $(document).ready(function() {
                     currentAnswer.DancerEfforts[currDancerID].push(answer);
                 }
             } else { 
-                showAlert("You have checked \n "+ numEfforts + " efforts already");
+                showAlert("You have checked \n"+ numEfforts + " efforts already");
                 return;
             }
         } else {
