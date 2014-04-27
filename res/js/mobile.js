@@ -100,6 +100,7 @@ function loadDancerButtons() {
 
     // Set up the black boxes for all efforts
     $(".effort").css({
+        "border": "1px white solid",
         "box-shadow" : boxShadows.join(),
         'margin' : (numDancers * 2) + "px",
         "border-radius": "10px"
@@ -125,7 +126,6 @@ function loadDancerButtons() {
             // Activate the button for the current dancer
             $(this).addClass('active');
             $(this).css("border", "2px white solid");
-          
             $(this).data('clicked', 1);
             previousDancer = $(this);
         }
