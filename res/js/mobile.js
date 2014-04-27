@@ -125,7 +125,6 @@ function loadDancerButtons() {
             // Activate the button for the current dancer
             $(this).addClass('active');
             $(this).css("border", "2px white solid");
-          
             $(this).data('clicked', 1);
             previousDancer = $(this);
         }
