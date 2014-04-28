@@ -299,7 +299,7 @@ $(document).ready(function() {
 		console.log(data);
 		graph.maxValue = data.TotalDancers * data.EffortsPerDancer;
 		EFFORT_SCORES = [0, 0, 0, 0, 0, 0, 0, 0];
-		graph.update(scores);
+		graph.update(EFFORT_SCORES);
 	});
 
 	socket.on(ScoreClientMessage.ChangeLevel, function (data) {
