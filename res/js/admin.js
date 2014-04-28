@@ -41,7 +41,7 @@ $(document).ready(function() {
 
 		e.preventDefault();
 		//TODO(sean): Fix this, it's very hacky!! 
-		changeLevel($("#level-select").val().substring(6), $("#dancer-select").val().substring(0,1), $("#effort-select").val().substring(0,1));
+		changeLevel($("#level-select").val().substring(6) - 1, $("#dancer-select").val().substring(0,1), $("#effort-select").val().substring(0,1));
 	});
 });	
 

@@ -269,14 +269,20 @@ $(document).ready(function() {
 
 	socket.on(ScoreClientMessage.InitialConfig, function (data) {
 		console.log('scoreboard: initial config');
-		var initialScores = data.initialScores;
-		console.log(initialScores);
-		for (var i = 0; i < initialScores.length; i += 1) {
-			if (initialScores[i] > graph.maxValue) {
+		var initialHistogram = data.initialHistogram;
+		console.log(initialHistogram);
+		for (var i = 0; i < initialHistogram.length; i += 1) {
+			if (initialHistogram[i] > graph.maxValue) {
 				graph.maxValue += graph.maxValue;
 			}
 		}
-		graph.update(initialScores);
+		graph.update(initialHistogram);
+
+		for (team in data.teamScores) {
+			SCORES[team] = data.teamScores[team];
+		}
+		$('#illinois-score').text(SCORES['illinois']);
+		$('#irvine-score').text(SCORES['irvine']);
 	})	
 
 	socket.on(ScoreClientMessage.HistogramDeltas, function (data) {
