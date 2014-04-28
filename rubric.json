@@ -1,0 +1,16 @@
+{ "scores" :
+    [
+      [ [0], [5] ], 
+      [ [3], [6], [2], [4] ], 
+      [ [1, 6], [5, 7] ], 
+      [ [0, 3], [1, 5], [4, 6], [2, 7] ] 
+    ],
+
+  "_comment" :
+  	{
+  		"level1" : "flick; slash",
+  		"level2" : "glide; punch; float; press",
+  		"level3" : "dab/punch; wring/slash",
+  		"level4" : "flick/glide; dab/slash; punch/press; float/wring"
+  	}
+}
