@@ -9,7 +9,7 @@ var express = require('express')
 ;
 
 // State variables
-var SCORE_DELTAS = {"illinois" : 0, "irvine" : 0};
+var SCORES = {"illinois" : 0, "irvine" : 0};
 var HISTOGRAM_DELTAS = [0, 0, 0, 0, 0, 0, 0, 0];
 var SCORE_CLIENT_SOCKET_UIUC = new Array();
 var SCORE_CLIENT_SOCKET_IRVINE = new Array();
@@ -111,36 +111,6 @@ function tcp_handler(socket) {
 };
 
 
-// Calculates correct quiz answer matches
-// NOTE: Doesn't consider previous answer yet
-function getScoreChange(answer) {
-  console.log("Calculating score for quiz answer");
-  var count = 0;
-  if (answer) {
-    // Loop through each dancer
-    for (var dancerId in answer.DancerEfforts) {
-      // Check if the dancer is actually dancing this level
-      if (dancerId in LEVEL_SETTING["DancerEfforts"]) {
-        console.log("\t Guess for dancer: " + dancerId);
-        // Check if the effort guess is correct
-        for (var i = 0; i < answer.DancerEfforts[dancerId].length; i += 1) {
-          var effortId = answer.DancerEfforts[dancerId][i];
-          console.log("\t Effort: " + effortId);
-          if (LEVEL_SETTING.DancerEfforts[dancerId].indexOf(parseInt(effortId)) > -1) {
-            count += 1;
-          } else {
-            console.log("\t Incorrect effort guess: " + effortId); 
-          }
-        }
-      } else {
-        console.log("\t Dancer not in current level: " + dancerId);
-      }
-    }
-  }
-  console.log('\t Answer score: ' + count);
-  return count;
-};
-
 //To be called at the end of level finishedLevel (int)
 //Sends updated team scores to respective scoreboard clients based on all data so far
 function updateScores(finishedLevel) {
@@ -171,11 +141,15 @@ function updateScores(finishedLevel) {
   console.log("totalResponses " + JSON.stringify(totalResponses));
   console.log("correctResponses " + JSON.stringify(correctResponses));
   
-  var score_updates = {};
-
+  var score_updates = {"illinois" : 0, "irvine" : 0};
+  console.log("Before SCORES are " + JSON.stringify(SCORES));
   for (team in totalResponses) {
-    score_updates[team] = Math.round(100 * correctResponses[team] / totalResponses[team]);
+    if (totalResponses[team] > 0) {
+      score_updates[team] = Math.round(100 * correctResponses[team] / totalResponses[team]);
+    }
+    SCORES[team] += score_updates[team];
   }
+  console.log("After SCORES are " + JSON.stringify(SCORES));
 
   console.log("new scores are " + JSON.stringify(score_updates));
   if(SCORE_CLIENT_SOCKET_UIUC) {
@@ -290,7 +264,7 @@ io.sockets.on('connection', function (socket) {
   // Score Client Handlers
   socket.on(ScoreClientMessage.Connection, function (data) {
     console.log("server: score client connected");
-    var initialScores = [0, 0, 0, 0, 0, 0, 0, 0];
+    var initialHistogram = [0, 0, 0, 0, 0, 0, 0, 0];
     
     if (data.Team == 'illinois')
     {
@@ -301,12 +275,14 @@ io.sockets.on('connection', function (socket) {
       for (var j = 0; j < all_scores[data.Team][ACTIVE_LEVEL].length; j+= 1) {
         var effortsPerDancer = all_scores[data.Team][ACTIVE_LEVEL][j];
         for (var i = 0; i < effortsPerDancer.length; i+= 1) {
-          initialScores[i] += effortsPerDancer[i];
+          initialHistogram[i] += effortsPerDancer[i];
         } 
       }
-      console.log("initialScores are " + initialScores);
+      console.log("initialHistogram are " + initialHistogram);
+      // console.log("SCORES are " + JSON.stringify(SCORES));
       socket.emit(ScoreClientMessage.InitialConfig, {
-        "initialScores" : initialScores
+        "initialHistogram" : initialHistogram,
+        "teamScores" : SCORES
       })
     }
     else if (data.Team == 'irvine') {
@@ -316,13 +292,14 @@ io.sockets.on('connection', function (socket) {
       for (var j = 0; j < all_scores[data.Team][ACTIVE_LEVEL].length; j+= 1) {
         var effortsPerDancer = all_scores[data.Team][ACTIVE_LEVEL][j];
         for (var i = 0; i < effortsPerDancer.length; i+= 1) {
-          initialScores[i] += effortsPerDancer[i];
+          initialHistogram[i] += effortsPerDancer[i];
         } 
       }
 
-      console.log("initialScores are " + initialScores);
+      console.log("initialHistogram are " + initialHistogram);
       socket.emit(ScoreClientMessage.InitialConfig, {
-        "initialScores" : initialScores
+        "initialHistogram" : initialHistogram,
+        "teamScores" : SCORES
       })
     }
   });
