@@ -229,7 +229,7 @@ $(document).ready(function() {
 
 	// Effort order taken from index.html
 	graph.xAxisLabelArr = 
-		["Flick", "Dab", "Float", "Glide", "Press", "Slash", "Thrust", "Wring"];
+		["Flick", "Dab", "Float", "Glide", "Press", "Slash", "Punch", "Wring"];
 	graph.update([0, 0, 0, 0, 0, 0, 0, 0]);
 
 	$("#bar_canvas").css(

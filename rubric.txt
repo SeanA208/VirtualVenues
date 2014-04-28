@@ -1,0 +1,14 @@
+Level 1: flick; slash
+Level 2: glide; punch; float; press
+Level 3: dab/punch; wring/slash
+Level 4: (only two per dancer) flick/glide; dab/slash; punch/press; float/wring
+
+
+{ "scores" :
+    [
+      [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ], // Level 1, Dancers 1 and 2
+      [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ], // Level 2, Dancers 1, 2, 3, 4
+      [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ], // Level 3, Dancers 1, 2
+      [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ] // Level 4, Dancers 1, 2, 3, 4
+    ]
+}
