@@ -200,7 +200,7 @@ io.sockets.on('connection', function (socket) {
       console.log ("\t score client not connected for UIUC");
       return;
     }
-    else if(data.Team == 'irvine' && !SCORE_CLIENT_SOCKET_IRVINE.length == 0) {
+    else if(data.Team == 'irvine' && SCORE_CLIENT_SOCKET_IRVINE.length == 0) {
       console.log ("\t score client not connected for Irvine");
       return;
     }
