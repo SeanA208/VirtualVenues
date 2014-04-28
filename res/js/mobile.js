@@ -22,7 +22,7 @@ var currentAnswer = {
     "Level" : null,
     "DancerEfforts" : {}
 };
-var COLORS = ["crimson", "yellowgreen", "indigo", "teal", "salmon", "plum", "lavender", "aqua"];
+var COLORS = ["crimson", "yellowgreen", "indigo", "orange", "salmon", "plum", "lavender", "aqua"];
 
 // State Variables
 var LEVEL_SETTING = null;
