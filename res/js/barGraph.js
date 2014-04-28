@@ -169,7 +169,7 @@ function BarGraph(ctx) {
   this.height;	
   this.maxValue;
   this.margin = 5;
-  this.colors = ["purple", "red", "green", "yellow"];
+  this.colors = ["purple", "red", "green", "yellow", "navy", "orange", "turquoise", "brown"];
   this.curArr = [];
   this.backgroundColor = "#000";
   this.xAxisLabelArr = [];

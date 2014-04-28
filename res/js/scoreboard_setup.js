@@ -225,7 +225,7 @@ $(document).ready(function() {
 	graph.height = get_screen_size()[1] * BAR_GRAPH_RATIO;
 	graph.maxValue = 10;
 	graph.margin = 2;
-	graph.colors = ["green", "red", "blue", "yellow"];
+	graph.colors = ["red", "orangered", "goldenrod", "green", "deepskyblue", "blue", "purple", "fuchsia"];
 
 	// Effort order taken from index.html
 	graph.xAxisLabelArr = 
