@@ -183,7 +183,10 @@ $(document).ready(function() {
                     currentAnswer.DancerEfforts[currDancerID].push(answer);
                 }
             } else { 
-                showAlert("You have checked \n"+ numEfforts + " efforts already");
+                showAlert("You have checked\n" 
+                    + numEfforts 
+                    + " effort" + (numEfforts > 1 ? "s" : "") 
+                    + "already");
                 return;
             }
         } else {
