@@ -7,15 +7,15 @@ var socket = io.connect(HOST);
 
 // Message Type Definitions
 var ServerMessage = {
-	ActiveLevel : "activelevel",  
-	LevelUp : "levelup",
-	Quiz : "quiz"
+	Quiz : "quiz",
+	LevelSetting : "levelsetting"
 };
 
 var ScoreClientMessage = {
 	Connection : "scoreconnection",
 	ScoreDeltas : "scoredeltas",
-	EffortDeltas : "effortdeltas" 
+	EffortDeltas : "effortdeltas",
+	ChangeLevel : "scorechangelevel"
 };
 
 // State Variables
@@ -23,7 +23,8 @@ var ACTIVE_LEVEL = 0;
 var SCORES = {"illinois" : 0, "irvine" : 0};
 var EFFORT_SCORES = [0, 0, 0, 0, 0, 0, 0, 0];
 var CURRENT_TEAM = "illinois";
-
+var ANIMATION_RATIO = 3 / 4;
+var BAR_GRAPH_RATIO = 1 - ANIMATION_RATIO;
 
 function $i(id) { return document.getElementById(id); }
 function $c(code) { return String.fromCharCode(code); }
@@ -31,6 +32,8 @@ function $c(code) { return String.fromCharCode(code); }
 function get_screen_size() {
 	var w=document.documentElement.clientWidth;
 	var h=document.documentElement.clientHeight;
+	// var w = screen.availWidth;
+	// var h = screen.availHeight;
 	return Array(w,h);
 }
 
@@ -194,7 +197,7 @@ function draw_dot(x,y) {
 
 function resize() {	
 	canvas_w=get_screen_size()[0];
-	canvas_h=get_screen_size()[1] * 3 / 4;
+	canvas_h=get_screen_size()[1] * ANIMATION_RATIO;
 	init();
 }	
 
@@ -217,11 +220,10 @@ function key_manager(evt) {
 
 $(document).ready(function() {
 	var ctx = $("#bar_canvas")[0].getContext("2d");
-	
 	var graph = new BarGraph(ctx);
-	graph.width = get_screen_size()[0] / 2;
-	graph.height = get_screen_size()[1] / 4;
-	graph.maxValue = 100;
+	graph.width = get_screen_size()[0] * 8 / 10;
+	graph.height = get_screen_size()[1] * BAR_GRAPH_RATIO;
+	graph.maxValue = 10;
 	graph.margin = 2;
 	graph.colors = ["green", "red", "blue", "yellow"];
 
@@ -245,17 +247,6 @@ $(document).ready(function() {
     }
     CURRENT_TEAM = parameters.team;
 	socket.emit(ScoreClientMessage.Connection, {'Team' : parameters.team });
-
-	socket.on(ServerMessage.ActiveLevel, function (data) {
-		console.log('scoreboard: active level message');
-		ACTIVE_LEVEL = data.Level;
-	});
-
-	socket.on(ServerMessage.LevelUp, function (data) {
-		console.log('scoreboard: level up message');
-		ACTIVE_LEVEL = data.Level;
-		// May want to do some checks here
-	});
 
 	socket.on(ScoreClientMessage.ScoreDeltas, function (data) {
 		console.log('scoreboard: score deltas message');
@@ -287,6 +278,9 @@ $(document).ready(function() {
 			for (var i = 0; i < data.Deltas.length; i += 1) {
 				EFFORT_SCORES[i] += data.Deltas[i];
 				NEW_SCORES[i] = (EFFORT_SCORES[i] < 0 ? 0 : EFFORT_SCORES[i]);
+				if (NEW_SCORES[i] > graph.maxValue) {
+					graph.maxValue += graph.maxValue;
+				}
 			}
 			console.log("new histogram values");
 			if (CURRENT_TEAM == data.Team) {
@@ -298,5 +292,21 @@ $(document).ready(function() {
 				console.log("Sorry they are not equal");
 			}
 		}
+	});
+
+	socket.on(ServerMessage.LevelSetting, function (data) {
+		console.log(ServerMessage.LevelSetting);
+		console.log(data);
+		graph.maxValue = data.TotalDancers * data.EffortsPerDancer;
+		EFFORT_SCORES = [0, 0, 0, 0, 0, 0, 0, 0];
+		graph.update(scores);
+	});
+
+	socket.on(ScoreClientMessage.ChangeLevel, function (data) {
+		console.log(ScoreClientMessage.ChangeLevel);
+		console.log(data);
+		graph.maxValue = data.TotalDancers * data.EffortsPerDancer;
+		EFFORT_SCORES = [0, 0, 0, 0, 0, 0, 0, 0];
+		graph.update(EFFORT_SCORES);
 	});
 });	

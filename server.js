@@ -47,7 +47,8 @@ var ClientMessage = {
 var ScoreClientMessage = {
   Connection : "scoreconnection",
   ScoreDeltas : "scoredeltas",
-  EffortDeltas : "effortdeltas" 
+  EffortDeltas : "effortdeltas",
+  ChangeLevel : "scorechangelevel"
 };
 
 var AdminClientMessage = {
@@ -131,7 +132,7 @@ io.sockets.on('connection', function (socket) {
   // Client Handlers
   socket.on(ClientMessage.QuizAnswer, function(data) {  
     console.log('server: quiz answer');
-    console.log(data);  
+    console.log(data);
 
     if (data.Answer.Level != ACTIVE_LEVEL) {
       console.log("\t quiz answer level is different from current");
@@ -142,7 +143,7 @@ io.sockets.on('connection', function (socket) {
       console.log ("\t score client not connected for UIUC");
       return;
     }
-    else if(data.Team == 'irvine' && !SCORE_CLIENT_SOCKET_IRVINE.length == 0 ) {
+    else if(data.Team == 'irvine' && !SCORE_CLIENT_SOCKET_IRVINE.length == 0) {
       console.log ("\t score client not connected for Irvine");
       return;
     }
@@ -266,4 +267,22 @@ function sendLevelUpdates() {
     "TotalDancers" : LEVEL_SETTING.TotalDancers,
     "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
   });
+
+  var levelChange = {
+    "Level" : ACTIVE_LEVEL,
+    "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer,
+    "TotalDancers" : LEVEL_SETTING.TotalDancers
+  };
+
+  if (SCORE_CLIENT_SOCKET_IRVINE) {
+    for (var i=0; i < SCORE_CLIENT_SOCKET_IRVINE.length; i++ ) {
+      SCORE_CLIENT_SOCKET_IRVINE[i].emit(ScoreClientMessage.ChangeLevel, levelChange);
+    }
+  }
+
+  if (SCORE_CLIENT_SOCKET_UIUC) {
+    for (var i=0; i < SCORE_CLIENT_SOCKET_UIUC.length; i++ ) {
+      SCORE_CLIENT_SOCKET_UIUC[i].emit(ScoreClientMessage.ChangeLevel, levelChange);
+    }
+  }
 };
