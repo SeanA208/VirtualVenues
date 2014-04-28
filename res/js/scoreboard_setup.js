@@ -26,14 +26,17 @@ var CURRENT_TEAM = "illinois";
 var ANIMATION_RATIO = 3 / 4;
 var BAR_GRAPH_RATIO = 1 - ANIMATION_RATIO;
 
+
+/* 
+	Kaleidoscop animation code
+	Credit to: http://www.chiptune.com/kaleidoscope
+*/
 function $i(id) { return document.getElementById(id); }
 function $c(code) { return String.fromCharCode(code); }
 
 function get_screen_size() {
 	var w=document.documentElement.clientWidth;
 	var h=document.documentElement.clientHeight;
-	// var w = screen.availWidth;
-	// var h = screen.availHeight;
 	return Array(w,h);
 }
 
