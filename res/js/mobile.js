@@ -186,7 +186,7 @@ $(document).ready(function() {
                 showAlert("You have checked\n" 
                     + numEfforts 
                     + " effort" + (numEfforts > 1 ? "s" : "") 
-                    + "already");
+                    + " already");
                 return;
             }
         } else {
