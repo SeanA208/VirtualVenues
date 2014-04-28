@@ -221,9 +221,9 @@ $(document).ready(function() {
 	var graph = new BarGraph(ctx);
 	graph.width = get_screen_size()[0] / 2;
 	graph.height = get_screen_size()[1] / 4;
-	graph.maxValue = 100;
+	graph.maxValue = 1;
 	graph.margin = 2;
-	graph.colors = ["green", "red", "blue", "yellow"];
+	graph.colors = ["red", "orangered", "goldenrod", "green", "deepskyblue", "blue", "purple", "fuchsia"];
 
 	// Effort order taken from index.html
 	graph.xAxisLabelArr = 
