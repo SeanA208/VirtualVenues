@@ -167,9 +167,6 @@ function updateScores(finishedLevel) {
         { "Deltas" : score_updates });
       }
     }  
-
-
-
 }
 
 /* 
