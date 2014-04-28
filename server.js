@@ -34,6 +34,31 @@ var LEVEL_SETTINGS = [
     "DancerEfforts" : {'1' : [0, 1], '2' : [2, 3], '3' : [4, 5], '4' : [6,7]}}
 ];
 
+var RUBRIC = JSON.parse(fs.readFileSync('rubric.json', 'utf8'));
+
+var all_scores = {
+  "illinois" : 
+    // Per level
+    [
+      // Histogram per dancer
+      [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ], // Level 1, Dancers 1 and 2
+      [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ], // Level 2, Dancers 1, 2, 3, 4
+      [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ], // Level 3, Dancers 1, 2
+      [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ] // Level 4, Dancers 1, 2, 3, 4
+    ],
+
+  "irvine" : 
+    // Per level
+    [
+      // Histogram per dancer
+      [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ], // Level 1, Dancers 1 and 2
+      [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ], // Level 2, Dancers 1, 2, 3, 4
+      [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ], // Level 3, Dancers 1, 2
+      [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ] // Level 4, Dancers 1, 2, 3, 4
+    ],
+}
+
+
 // Message Type Definitions
 var ServerMessage = { 
   LevelSetting : "levelsetting",
@@ -115,6 +140,64 @@ function getScoreChange(answer) {
   return count;
 };
 
+//To be called at the end of level finishedLevel (int)
+//Sends updated team scores to respective scoreboard clients based on all data so far
+function updateScores(finishedLevel) {
+
+  var totalResponses = {}
+  var correctResponses = {}
+  for (team in all_scores) {
+    totalResponses[team] = 0;
+    correctResponses[team] = 0;
+    var current_level = all_scores[team][finishedLevel];
+    for (var dancer_id = 0; dancer_id < current_level.length; dancer_id += 1) {
+      var dancer_histogram = current_level[dancer_id];
+      for (var effort_id = 0; effort_id < dancer_histogram.length; effort_id += 1) {
+        var effort_score = dancer_histogram[effort_id];
+        totalResponses[team] += effort_score;
+        
+        //Array of correct responses for a given dancer at a given level
+        var correct_answers = RUBRIC["scores"][finishedLevel][dancer_id];
+
+        if (correct_answers.indexOf(effort_id) != -1) {
+          // This is the right answer!
+          correctResponses[team] += effort_score;
+        }
+      }
+    }
+  }
+
+  //Send out updates
+console.log("totalResponses " + JSON.stringify(totalResponses));
+console.log("correctResponses " + JSON.stringify(correctResponses));
+  
+  var score_updates = {};
+
+  for (team in totalResponses) {
+    score_updates[team] = Math.round(100 * correctResponses[team] / totalResponses[team]);
+  }
+
+  console.log("new scores are " + JSON.stringify(score_updates));
+  if(SCORE_CLIENT_SOCKET_UIUC) {
+      console.log('server: Illinois Score emit');
+      for(var i=0; i<SCORE_CLIENT_SOCKET_UIUC.length; i++) {
+        SCORE_CLIENT_SOCKET_UIUC[i].emit(ScoreClientMessage.ScoreDeltas, 
+        { "Deltas" : score_updates }); 
+      }
+    }
+    
+    if(SCORE_CLIENT_SOCKET_IRVINE) {
+      console.log('server: irvine Score emit');
+      for (var i = 0; i <SCORE_CLIENT_SOCKET_IRVINE.length; i++) {
+        SCORE_CLIENT_SOCKET_IRVINE[i].emit(ScoreClientMessage.ScoreDeltas, 
+        { "Deltas" : score_updates });
+      }
+    }  
+
+
+
+}
+
 /* 
   Handle client events
 */
@@ -148,48 +231,45 @@ io.sockets.on('connection', function (socket) {
       return;
     }
 
-    var currentScore = getScoreChange(data.Answer);
-    var previousScore = getScoreChange(data.PreviousAnswer);
-    var scoreChange = currentScore - previousScore;
-    console.log('scoreChange:' + scoreChange);
-    if (scoreChange != 0) {
-      SCORE_DELTAS[data.Team] = scoreChange;
-      console.log('Score Deltas: ');   
-      console.log(SCORE_DELTAS);
+    //Format of data object returned
+    // data
+    //    - Level
+    //      + int            
+    //    - DancerEfforts
+    //      + [1, 2] // Dancer 0, Efforts 1 and 2
+    //      + [0, 1] // Dancer 1, Efforts 0 and 1
 
-      if(SCORE_CLIENT_SOCKET_UIUC) {
-        console.log('server: Illinois Score emit');
-        for(var i=0; i<SCORE_CLIENT_SOCKET_UIUC.length; i++) {
-          SCORE_CLIENT_SOCKET_UIUC[i].emit(ScoreClientMessage.ScoreDeltas, 
-          { "Deltas" : SCORE_DELTAS }); 
-        }
-      }
-      
-      if(SCORE_CLIENT_SOCKET_IRVINE ) {
-        console.log('server: irvine Score emit');
-        for (var i = 0; i <SCORE_CLIENT_SOCKET_IRVINE.length; i++) {
-          SCORE_CLIENT_SOCKET_IRVINE[i].emit(ScoreClientMessage.ScoreDeltas, 
-          { "Deltas" : SCORE_DELTAS });
-        }
-      }  
-    }
-
-    for (var dancerId in data.Answer.DancerEfforts) {
-      for (var i = 0; i < data.Answer.DancerEfforts[dancerId].length; i += 1) {
-        HISTOGRAM_DELTAS[data.Answer.DancerEfforts[dancerId][i]] += 1;    
-      }
-    }
 
     if (data.PreviousAnswer) {
+    //TODO(sean): Clean this up, time permitting
+      
+      // Update all scores
       for (var dancerId in data.PreviousAnswer.DancerEfforts) {
-        for (var i = 0; i < data.PreviousAnswer.DancerEfforts[dancerId].length; i += 1) {
-          HISTOGRAM_DELTAS[data.PreviousAnswer.DancerEfforts[dancerId][i]] -= 1;
+        var currentEfforts = data.PreviousAnswer.DancerEfforts[dancerId];
+        for (var i = 0; i < currentEfforts.length; i += 1) {
+          all_scores[data.Team][data.Answer.Level][(dancerId - 1)][currentEfforts[i]] -= 1;
+          HISTOGRAM_DELTAS[currentEfforts[i]] -= 1;
         }
       }
-    }
-    else {
+    } else {
       console.log('\t no previous answer');
     }
+
+    // Update all scores
+    console.log("level is " + data.Answer.Level);
+    for (var dancerId in data.Answer.DancerEfforts) {
+      console.log("dancerId is " + dancerId);
+      var currentEfforts = data.Answer.DancerEfforts[dancerId];
+      console.log("currentEfforts is " + currentEfforts);
+      for (var i = 0; i < currentEfforts.length; i += 1) {
+        console.log("currentEffort at i is " + currentEfforts[i]);
+        all_scores[data.Team][data.Answer.Level][(dancerId - 1)][currentEfforts[i]] += 1;
+        HISTOGRAM_DELTAS[currentEfforts[i]] += 1;    
+      }
+    }
+
+    
+    
     
     if (data.Team == 'illinois' && SCORE_CLIENT_SOCKET_UIUC.length > 0 ){
       console.log('UIUC HistogramDeltas');
@@ -249,12 +329,16 @@ io.sockets.on('connection', function (socket) {
 
   socket.on(AdminClientMessage.ChangeLevel, function(data) {
     console.log("server: admin supplying new level information");
-    if (data.level)
+    if (data.level) {
+      updateScores(ACTIVE_LEVEL);
       ACTIVE_LEVEL = data.level;
-    if (data.totalDancers)
+    }
+    if (data.totalDancers) {
       LEVEL_SETTING.TotalDancers = data.totalDancers;
-    if (data.effortsPerDancer)
+    }
+    if (data.effortsPerDancer) {
       LEVEL_SETTING.EffortsPerDancer = data.effortsPerDancer;
+    }
 
     sendLevelUpdates();
   })
@@ -274,6 +358,7 @@ function sendLevelUpdates() {
     "TotalDancers" : LEVEL_SETTING.TotalDancers
   };
 
+
   if (SCORE_CLIENT_SOCKET_IRVINE) {
     for (var i=0; i < SCORE_CLIENT_SOCKET_IRVINE.length; i++ ) {
       SCORE_CLIENT_SOCKET_IRVINE[i].emit(ScoreClientMessage.ChangeLevel, levelChange);
@@ -285,4 +370,5 @@ function sendLevelUpdates() {
       SCORE_CLIENT_SOCKET_UIUC[i].emit(ScoreClientMessage.ChangeLevel, levelChange);
     }
   }
+
 };
