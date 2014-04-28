@@ -45,7 +45,8 @@ socket.on(ServerMessage.LevelSetting, function (data) {
     numDancers = LEVEL_SETTING.TotalDancers;
     numEfforts = LEVEL_SETTING.EffortsPerDancer;
     currLevel = LEVEL_SETTING.Level;    
-    currentAnswer.Level = LEVEL_SETTING.Level; 
+    currentAnswer.Level = LEVEL_SETTING.Level;
+    previousAnswer = null;
 
     console.log("dancers: " + numDancers + ", efforts: " + numEfforts);
     $("#titleinfo").text("Pick " + numEfforts + " per dancer");
