@@ -73,7 +73,8 @@ var ScoreClientMessage = {
   Connection : "scoreconnection",
   ScoreDeltas : "scoredeltas",
   EffortDeltas : "effortdeltas",
-  ChangeLevel : "scorechangelevel"
+  ChangeLevel : "scorechangelevel",
+  InitialConfig : "scoreinitialconfig"
 };
 
 var AdminClientMessage = {
@@ -143,7 +144,6 @@ function getScoreChange(answer) {
 //To be called at the end of level finishedLevel (int)
 //Sends updated team scores to respective scoreboard clients based on all data so far
 function updateScores(finishedLevel) {
-
   var totalResponses = {}
   var correctResponses = {}
   for (team in all_scores) {
@@ -168,8 +168,8 @@ function updateScores(finishedLevel) {
   }
 
   //Send out updates
-console.log("totalResponses " + JSON.stringify(totalResponses));
-console.log("correctResponses " + JSON.stringify(correctResponses));
+  console.log("totalResponses " + JSON.stringify(totalResponses));
+  console.log("correctResponses " + JSON.stringify(correctResponses));
   
   var score_updates = {};
 
@@ -267,8 +267,6 @@ io.sockets.on('connection', function (socket) {
         HISTOGRAM_DELTAS[currentEfforts[i]] += 1;    
       }
     }
-
-    
     
     
     if (data.Team == 'illinois' && SCORE_CLIENT_SOCKET_UIUC.length > 0 ){
@@ -292,14 +290,40 @@ io.sockets.on('connection', function (socket) {
   // Score Client Handlers
   socket.on(ScoreClientMessage.Connection, function (data) {
     console.log("server: score client connected");
+    var initialScores = [0, 0, 0, 0, 0, 0, 0, 0];
+    
     if (data.Team == 'illinois')
     {
       console.log("server: score client set for UIUC");
       SCORE_CLIENT_SOCKET_UIUC.push(socket);
+      console.log("All Scores before initial are " + JSON.stringify(all_scores));
+
+      for (var j = 0; j < all_scores[data.Team][ACTIVE_LEVEL].length; j+= 1) {
+        var effortsPerDancer = all_scores[data.Team][ACTIVE_LEVEL][j];
+        for (var i = 0; i < effortsPerDancer.length; i+= 1) {
+          initialScores[i] += effortsPerDancer[i];
+        } 
+      }
+      console.log("initialScores are " + initialScores);
+      socket.emit(ScoreClientMessage.InitialConfig, {
+        "initialScores" : initialScores
+      })
     }
     else if (data.Team == 'irvine') {
       console.log("server: score client set for Irvine");
       SCORE_CLIENT_SOCKET_IRVINE.push(socket);
+
+      for (var j = 0; j < all_scores[data.Team][ACTIVE_LEVEL].length; j+= 1) {
+        var effortsPerDancer = all_scores[data.Team][ACTIVE_LEVEL][j];
+        for (var i = 0; i < effortsPerDancer.length; i+= 1) {
+          initialScores[i] += effortsPerDancer[i];
+        } 
+      }
+
+      console.log("initialScores are " + initialScores);
+      socket.emit(ScoreClientMessage.InitialConfig, {
+        "initialScores" : initialScores
+      })
     }
   });
 

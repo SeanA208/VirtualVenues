@@ -15,7 +15,8 @@ var ScoreClientMessage = {
 	Connection : "scoreconnection",
 	ScoreDeltas : "scoredeltas",
 	EffortDeltas : "effortdeltas",
-	ChangeLevel : "scorechangelevel"
+	ChangeLevel : "scorechangelevel",
+	InitialConfig : "scoreinitialconfig"
 };
 
 // State Variables
@@ -264,7 +265,19 @@ $(document).ready(function() {
 		}, 500);
 		$('#illinois-score').text(SCORES['illinois']);
 		$('#irvine-score').text(SCORES['irvine']);
-	});	
+	});
+
+	socket.on(ScoreClientMessage.InitialConfig, function (data) {
+		console.log('scoreboard: initial config');
+		var initialScores = data.initialScores;
+		console.log(initialScores);
+		for (var i = 0; i < initialScores.length; i += 1) {
+			if (initialScores[i] > graph.maxValue) {
+				graph.maxValue += graph.maxValue;
+			}
+		}
+		graph.update(initialScores);
+	})	
 
 	socket.on(ScoreClientMessage.HistogramDeltas, function (data) {
 		console.log('scoreboard: histogram deltas message');
