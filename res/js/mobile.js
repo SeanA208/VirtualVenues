@@ -22,7 +22,7 @@ var currentAnswer = {
     "Level" : null,
     "DancerEfforts" : {}
 };
-var COLORS = ["crimson", "yellowgreen", "indigo", "teal", "salmon", "plum", "lavender", "aqua"];
+var COLORS = ["crimson", "yellowgreen", "indigo", "orange", "teal", "plum", "lavender", "aqua"];
 
 // State Variables
 var LEVEL_SETTING = null;
@@ -51,7 +51,6 @@ socket.on(ServerMessage.LevelSetting, function (data) {
     console.log("dancers: " + numDancers + ", efforts: " + numEfforts);
     $("#titleinfo").text("Pick " + numEfforts + " per dancer");
     $("#titleinfo").css({
-        //"font-family" : "Chicago, Verdana, sans-seriff",
         "font-size" : "medium"
     });
     loadDancerButtons();
