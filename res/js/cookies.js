@@ -26,7 +26,7 @@ Routine to write a session cookie
 function writeSessionCookie (cookieName, cookieValue) {
   if (testSessionCookie()) {
     var date = new Date();
-    date.setTime(date.getTime() + (30*60*1000)); // Half an hour expiration
+    date.setTime(date.getTime() + (2.5*60*1000)); 
     var expires = "; expires="+ date.toGMTString();
     document.cookie = escape(cookieName) + "=" + escape(cookieValue) + expires + "; path=/";
     return true;

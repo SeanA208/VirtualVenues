@@ -26,11 +26,11 @@ var LEVEL_SETTING = {
 // TEST
 // Hard coded settings per level
 var LEVEL_SETTINGS = [
-  {"TotalDancers" : 2, "EffortsPerDancer" : 1, 
+  { "TotalDancers" : 2, "EffortsPerDancer" : 1, 
     "DancerEfforts" : {'1' : [0], '2' : [2]}},
-  {"TotalDancers" : 3, "EffortsPerDancer" : 2, 
+  { "TotalDancers" : 3, "EffortsPerDancer" : 2, 
     "DancerEfforts" : {'1' : [6, 7], '2' : [2, 3], '3': [1, 2]}},
-  {"TotalDancers" : 4, "EffortsPerDancer" : 2,
+  { "TotalDancers" : 4, "EffortsPerDancer" : 2,
     "DancerEfforts" : {'1' : [0, 1], '2' : [2, 3], '3' : [4, 5], '4' : [6,7]}}
 ];
 

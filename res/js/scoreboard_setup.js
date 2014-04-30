@@ -258,14 +258,6 @@ $(document).ready(function() {
 		for (var team in data.Deltas) {
 			SCORES[team] += data.Deltas[team];
 		}
-		var animationUpdates = 0;
-		var resetLoop = setInterval(function() {
-			if (animationUpdates >= SCORES[CURRENT_TEAM]) {
-				clearInterval(resetLoop);
-			}
-			reset();
-			animationUpdates += 1;
-		}, 500);
 		$('#illinois-score').text(SCORES['illinois']);
 		$('#irvine-score').text(SCORES['irvine']);
 	});
@@ -306,12 +298,28 @@ $(document).ready(function() {
 			}
 			console.log("new histogram values");
 			if (CURRENT_TEAM == data.Team) {
-				console.log("YEP! They are the same");
 				graph.update(NEW_SCORES);
 				console.log(NEW_SCORES);
+
+				var animationUpdates = data.Deltas.reduce( 
+					function (prev, curr, index, arr) {
+						return prev + curr;
+					}
+				);
+
+				if (animationUpdates > 0) {
+					var resetLoop = setInterval(function() {
+						if (animationUpdates <= 0) {
+							clearInterval(resetLoop);
+							return;
+						}
+						reset();
+						animationUpdates--;
+					}, 500);
+				}
 			}
 			else{
-				console.log("Sorry they are not equal");
+				console.log("wrong team scores");
 			}
 		}
 	});
@@ -322,6 +330,7 @@ $(document).ready(function() {
 		graph.maxValue = data.TotalDancers * data.EffortsPerDancer;
 		EFFORT_SCORES = [0, 0, 0, 0, 0, 0, 0, 0];
 		graph.update(EFFORT_SCORES);
+		$("#level").html("Level<br>" + (data.Level + 1));
 	});
 
 	socket.on(ScoreClientMessage.ChangeLevel, function (data) {
@@ -330,5 +339,6 @@ $(document).ready(function() {
 		graph.maxValue = data.TotalDancers * data.EffortsPerDancer;
 		EFFORT_SCORES = [0, 0, 0, 0, 0, 0, 0, 0];
 		graph.update(EFFORT_SCORES);
+		$("#level").html("Level<br>" + (data.Level + 1));
 	});
 });	
