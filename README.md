@@ -21,8 +21,8 @@ TODO:
 
 Nice to have:
 --------------
-- Fix effort buttons greying out
-- Bottom padding for submit/clear buttons (and in between?)
+- ~~Fix effort buttons greying out~~
+- ~~Bottom padding for submit/clear buttons (and in between?)~~
 - Let client repick his team
 
 
