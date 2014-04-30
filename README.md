@@ -17,8 +17,8 @@ TODO:
 - Let user re-pick his team (or reduce cookie expiration to a few minutes)
 - Kaleidescope Animation
 - Better admin 
-  ..* Clear all scores in the game, save them to file as well
-  ..* Only specify level (preset configurations)
+  Clear all scores in the game, save them to file as well
+  Only specify level (preset configurations)
 
 Nice to have:
 --------------
