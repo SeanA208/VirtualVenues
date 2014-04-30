@@ -14,12 +14,14 @@ var ServerMessage = {
 var ScoreClientMessage = {
 	Connection : "scoreconnection",
 	ScoreDeltas : "scoredeltas",
-	EffortDeltas : "effortdeltas" 
+	EffortDeltas : "effortdeltas"
 };
 
 var AdminClientMessage = {
   Connection : "adminconnection",
-  ChangeLevel : "adminchangelevel"
+  ChangeLevel : "adminchangelevel",
+  ResetScores : "adminresetscores",
+  GameOver: "admingameover"
 }
 
 // State Variables
@@ -38,16 +40,33 @@ $(document).ready(function() {
 	});
 
 	$("#update-button").click(function(e) {
-
 		e.preventDefault();
 		//TODO(sean): Fix this, it's very hacky!! 
-		changeLevel($("#level-select").val().substring(6) - 1, $("#dancer-select").val().substring(0,1), $("#effort-select").val().substring(0,1));
+		changeLevel(
+			$("#level-select").val().substring(6) - 1, 
+			$("#dancer-select").val().substring(0,1), 
+			$("#effort-select").val().substring(0,1)
+		);
+	});
+
+	$("#reset-button").click(function(e) {
+		e.preventDefault();
+		console.log("resetting scores");
+		socket.emit(AdminClientMessage.ResetScores);
+		//TODO: Save scores?
+	});
+
+	$("#game-over-button").click(function(e) {
+		e.preventDefault();
+		console.log("ending the game");
+		socket.emit(AdminClientMessage.GameOver);
+		//TODO: Save scores?
 	});
 });	
 
 
 function changeLevel(newLevel, newDancerNumber, newEffortNumber)	{
-	console.log("admin: trying to updatelevel to " + newLevel + " with dancers " + newDancerNumber + " and efforts " + newEffortNumber);
+	console.log("admin: trying to update level to " + newLevel + " with dancers " + newDancerNumber + " and efforts " + newEffortNumber);
 	socket.emit(AdminClientMessage.ChangeLevel, {
 		level : newLevel,
 		totalDancers : newDancerNumber,

@@ -8,7 +8,9 @@ var socket = io.connect(HOST);
 // Message Type Definitions
 var ServerMessage = {
 	Quiz : "quiz",
-	LevelSetting : "levelsetting"
+	LevelSetting : "levelsetting",
+	ResetScores : "resetscores",
+	GameOver : "gameover"
 };
 
 var ScoreClientMessage = {
@@ -282,12 +284,11 @@ $(document).ready(function() {
 
 	socket.on(ScoreClientMessage.HistogramDeltas, function (data) {
 		console.log('scoreboard: histogram deltas message');
-		console.log(data.Deltas);
 
-		if (!data.Deltas || !data.Deltas.length) {
+		if (!data || !data["Deltas"] || !data.Deltas.length) {
 			return;
-		}
-		else {
+		} else {
+			console.log(data.Deltas);
 			var NEW_SCORES = [0, 0, 0, 0, 0, 0, 0, 0];
 			for (var i = 0; i < data.Deltas.length; i += 1) {
 				EFFORT_SCORES[i] += data.Deltas[i];
@@ -340,5 +341,20 @@ $(document).ready(function() {
 		EFFORT_SCORES = [0, 0, 0, 0, 0, 0, 0, 0];
 		graph.update(EFFORT_SCORES);
 		$("#level").html("Level<br>" + (data.Level + 1));
+	});
+
+	socket.on(ServerMessage.ResetScores, function() {
+		console.log("scoreboard: reset scores message");
+		$('#illinois-score').text("0");
+		$('#irvine-score').text("0");
+		EFFORT_SCORES = [0, 0, 0, 0, 0, 0, 0, 0];
+		graph.update(EFFORT_SCORES);
+		ACTIVE_LEVEL = 0;
+		SCORES = {"illinois" : 0, "irvine" : 0};
+	});
+
+	socket.on(ServerMessage.GameOver, function() {
+		console.log("scoreboard: game over");
+		//TODO
 	});
 });	

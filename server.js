@@ -20,7 +20,8 @@ var LEVEL_SETTING = {
   "EffortsPerDancer" : 1,
   "DancerEfforts" : { 
     '1' : [0], 
-    '2' : [2]}
+    '2' : [2]
+  }
 };
 
 // TEST
@@ -62,7 +63,9 @@ var all_scores = {
 // Message Type Definitions
 var ServerMessage = { 
   LevelSetting : "levelsetting",
-  Quiz : "quiz"
+  Quiz : "quiz",
+  ResetScores : "resetscores",
+  GameOver : "gameover"
 };
 
 var ClientMessage = {
@@ -79,7 +82,9 @@ var ScoreClientMessage = {
 
 var AdminClientMessage = {
   Connection : "adminconnection",
-  ChangeLevel : "adminchangelevel"
+  ChangeLevel : "adminchangelevel",
+  ResetScores : "adminresetscores",
+  GameOver : "admingameover"
 }
 
 // Used ports and IP addresses
@@ -109,7 +114,6 @@ app.configure(function(){
 function tcp_handler(socket) {
   console.log('tcp handler: request received');
 };
-
 
 //To be called at the end of level finishedLevel (int)
 //Sends updated team scores to respective scoreboard clients based on all data so far
@@ -149,10 +153,11 @@ function updateScores(finishedLevel) {
     }
     SCORES[team] += score_updates[team];
   }
-  console.log("After SCORES are " + JSON.stringify(SCORES));
 
+  console.log("After SCORES are " + JSON.stringify(SCORES));
   console.log("new scores are " + JSON.stringify(score_updates));
-  if(SCORE_CLIENT_SOCKET_UIUC) {
+
+  if (SCORE_CLIENT_SOCKET_UIUC) {
       console.log('server: Illinois Score emit');
       for(var i=0; i<SCORE_CLIENT_SOCKET_UIUC.length; i++) {
         SCORE_CLIENT_SOCKET_UIUC[i].emit(ScoreClientMessage.ScoreDeltas, 
@@ -160,7 +165,7 @@ function updateScores(finishedLevel) {
       }
     }
     
-    if(SCORE_CLIENT_SOCKET_IRVINE) {
+    if (SCORE_CLIENT_SOCKET_IRVINE) {
       console.log('server: irvine Score emit');
       for (var i = 0; i <SCORE_CLIENT_SOCKET_IRVINE.length; i++) {
         SCORE_CLIENT_SOCKET_IRVINE[i].emit(ScoreClientMessage.ScoreDeltas, 
@@ -168,6 +173,20 @@ function updateScores(finishedLevel) {
       }
     }  
 }
+
+function sendMessageToScoreClients(message, data) {
+  if (SCORE_CLIENT_SOCKET_IRVINE) {
+    for (var i=0; i < SCORE_CLIENT_SOCKET_IRVINE.length; i++ ) {
+      SCORE_CLIENT_SOCKET_IRVINE[i].emit(message, data);
+    }
+  }
+
+  if (SCORE_CLIENT_SOCKET_UIUC) {
+    for (var i=0; i < SCORE_CLIENT_SOCKET_UIUC.length; i++ ) {
+      SCORE_CLIENT_SOCKET_UIUC[i].emit(message, data);
+    }
+  }
+};
 
 /* 
   Handle client events
@@ -339,7 +358,17 @@ io.sockets.on('connection', function (socket) {
     }
 
     sendLevelUpdates();
-  })
+  });
+
+  socket.on(AdminClientMessage.ResetScores, function(data) {
+    console.log("server: admin telling to reset scores");
+    sendMessageToScoreClients(ServerMessage.ResetScores, null);
+  });
+
+  socket.on(AdminClientMessage.GameOver, function(data) {
+    console.log("server: admin ending game");
+    sendMessageToScoreClients(ServerMessage.GameOver, null);
+  });
 });
 
 function sendLevelUpdates() {
@@ -356,17 +385,5 @@ function sendLevelUpdates() {
     "TotalDancers" : LEVEL_SETTING.TotalDancers
   };
 
-
-  if (SCORE_CLIENT_SOCKET_IRVINE) {
-    for (var i=0; i < SCORE_CLIENT_SOCKET_IRVINE.length; i++ ) {
-      SCORE_CLIENT_SOCKET_IRVINE[i].emit(ScoreClientMessage.ChangeLevel, levelChange);
-    }
-  }
-
-  if (SCORE_CLIENT_SOCKET_UIUC) {
-    for (var i=0; i < SCORE_CLIENT_SOCKET_UIUC.length; i++ ) {
-      SCORE_CLIENT_SOCKET_UIUC[i].emit(ScoreClientMessage.ChangeLevel, levelChange);
-    }
-  }
-
+  sendMessageToScoreClients(ScoreClientMessage.ChangeLevel, levelChange);
 };
