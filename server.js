@@ -359,7 +359,7 @@ io.sockets.on('connection', function (socket) {
     if (data.effortsPerDancer) {
       LEVEL_SETTING.EffortsPerDancer = data.effortsPerDancer;
     }
-    sendLevelUpdates();
+    sendLevelUpdates(answers);
   });
 
   socket.on(AdminClientMessage.ResetScores, function(data) {
