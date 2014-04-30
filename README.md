@@ -11,8 +11,8 @@ sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
 TODO:
 -----
 0. Add modal to scoreboard.html to shop the game over message 
-  1.Handle the modal in scoreboard_setup.html. 
-  2.Show the winning team
+  1. Handle the modal in scoreboard_setup.html. 
+  2. Show the winning team.
 1. End of level display correct answers (mobile and scoreboard)
 2. ~~Put level on scoreboard~~
 3. ~~Clean up mobile UI on smaller screens~~ **need to check iPhone 4**
