@@ -166,7 +166,9 @@ function updateScores(finishedLevel) {
         SCORE_CLIENT_SOCKET_IRVINE[i].emit(ScoreClientMessage.ScoreDeltas, 
         { "Deltas" : score_updates });
       }
-    }  
+    }
+  console.log("LEVEL FINISHED: level"+finishedLevel);
+  console.log("RUBIC Answers: " + RUBRIC["_comment"]["level"+(finishedLevel+1)]);  
 }
 
 /* 
@@ -327,6 +329,7 @@ io.sockets.on('connection', function (socket) {
 
   socket.on(AdminClientMessage.ChangeLevel, function(data) {
     console.log("server: admin supplying new level information");
+    var answers = RUBRIC["_comment"]["level"+(ACTIVE_LEVEL+1)];
     if (data.level) {
       updateScores(ACTIVE_LEVEL);
       ACTIVE_LEVEL = data.level;
@@ -338,16 +341,17 @@ io.sockets.on('connection', function (socket) {
       LEVEL_SETTING.EffortsPerDancer = data.effortsPerDancer;
     }
 
-    sendLevelUpdates();
+    sendLevelUpdates(answers);
   })
 });
 
-function sendLevelUpdates() {
+function sendLevelUpdates(previousAnswers) {
   console.log('server: sending level setting with level ' + ACTIVE_LEVEL);
   io.sockets.emit(ServerMessage.LevelSetting, { 
     "Level" : ACTIVE_LEVEL,
     "TotalDancers" : LEVEL_SETTING.TotalDancers,
-    "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
+    "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer,
+    "PreviousAnswers" : previousAnswers
   });
 
   var levelChange = {

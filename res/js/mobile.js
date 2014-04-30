@@ -49,6 +49,10 @@ socket.on(ServerMessage.LevelSetting, function (data) {
     currentAnswer.Level = LEVEL_SETTING.Level;
     previousAnswer = null;
 
+    if ( LEVEL_SETTING.PreviousAnswers != null ) {
+        showAlert(parseAnswers(LEVEL_SETTING.PreviousAnswers), 4000);
+    }
+
     console.log("dancers: " + numDancers + ", efforts: " + numEfforts);
     $("#titleinfo").text("Pick " + numEfforts + " per dancer");
     $("#titleinfo").css({
@@ -60,6 +64,17 @@ socket.on(ServerMessage.LevelSetting, function (data) {
 socket.on(ServerMessage.Quiz, function (data) {
     console.log('client: quiz message');
 });
+
+function parseAnswers(data) {
+    var formatedAnswer = "Level Answers\n";
+    //Split by ';' so we can answers per dancer
+    var answersPerDancer = data.split(";");
+    for (var i=0; i<answersPerDancer.length; i++) {
+        formatedAnswer += "Dancer "+(i+1)+":";
+        formatedAnswer += answersPerDancer[i] + "\n";
+    }
+    return formatedAnswer;
+}
 
 function loadDancerButtons() {
     // Clear all previous dancer buttons
@@ -125,11 +140,12 @@ function loadDancerButtons() {
     });
 };
 
-function showAlert(text){
-    $("#modal-alert").text(text);
+function showAlert(text, time){
+    var obj = $("#modal-alert").text(text);
+    obj.html(obj.html().replace(/\n/g,'<br/>'));
     $('#alertModal').modal('show');
     console.log("Calling from mobile.js");
-    setTimeout(function(){$('#alertModal').modal('hide')},1500);
+    setTimeout(function(){$('#alertModal').modal('hide')},time);
 
 };
 
@@ -164,7 +180,7 @@ $(document).ready(function() {
 
         // Check if a dancer has been selected
         if (!currDancerID || !currentAnswer.DancerEfforts[currDancerID]) {
-            showAlert("Pick a dancer first!");
+            showAlert("Pick a dancer first!", 1500);
             return;
         }
 
@@ -186,7 +202,7 @@ $(document).ready(function() {
                 showAlert("You have checked\n" 
                     + numEfforts 
                     + " effort" + (numEfforts > 1 ? "s" : "") 
-                    + " already");
+                    + " already", 1500);
                 return;
             }
         } else {
