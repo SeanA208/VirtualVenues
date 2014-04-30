@@ -37,16 +37,51 @@ $(document).ready(function() {
 		//TODO(sean): Update active level display
 	});
 
+	var endGame = document.getElementById("endGame-button");
+	if (endGame == null) {
+		console.log("NULL");
+	}
+
 	$("#update-button").click(function(e) {
 
 		e.preventDefault();
 		//TODO(sean): Fix this, it's very hacky!! 
-		changeLevel($("#level-select").val().substring(6) - 1, $("#dancer-select").val().substring(0,1), $("#effort-select").val().substring(0,1));
+		changeLevel($("#level-select").val().substring(6) - 1);
 	});
+
+	endGame.addEventListener('click', function() {
+		console.log('End Game');
+	}, false);
 });	
 
+function endGame() {
+	console.log("Admin Ended the Game");
+}
 
-function changeLevel(newLevel, newDancerNumber, newEffortNumber)	{
+
+function changeLevel(newLevel)	{
+	var newDancerNumber = 0;
+	var newEffortNumber = 0;
+	if ( newLevel == 0 ) {
+		//Level 1
+		newDancerNumber = 2;
+		newEffortNumber = 1;
+	}
+	else if ( newLevel == 1 ) {
+		//Level 2
+		newDancerNumber = 4;
+		newEffortNumber = 1;
+	}
+	else if ( newLevel == 2 ) {
+		//Level 3
+		newDancerNumber = 2;
+		newEffortNumber = 2;
+	}
+	else if ( newLevel == 3 ) {
+		//Level 4
+		newDancerNumber = 4;
+		newEffortNumber = 2;
+	}
 	console.log("admin: trying to updatelevel to " + newLevel + " with dancers " + newDancerNumber + " and efforts " + newEffortNumber);
 	socket.emit(AdminClientMessage.ChangeLevel, {
 		level : newLevel,
