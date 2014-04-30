@@ -12,5 +12,13 @@ sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
 TODO
 -----
 
+  Put level on scoreboard
+
+  End of level display correct answers (mobile and scoreboard)
+
+  Kaleidescope Animation
+
+  Better admin - Clear all scores in the game, save them to file as well, only specify level
+
 
 
