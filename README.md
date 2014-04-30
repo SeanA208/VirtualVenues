@@ -8,40 +8,22 @@ Run this on a fresh EC2 instance for external port 80 to hit interal port 8080
 
 sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
 
-
-TODO
+TODO:
 -----
+1. End of level display correct answers (mobile and scoreboard)
+2. ~~Put level on scoreboard~~
+3. Clean up mobile UI on smaller screens
+4. ~~Reduce cookie expiration to a few minutes~~ Changed to 2.5 minutes
+5. Kaleidoscope Animation
+6. Better admin 
+  1. Clear all scores in the game, save them to file as well
+  2. Only specify level (preset configurations)
 
-### Server [Sean + Neel]
-	* Make sure scoring works as intended 
-		* Team scoring + Effort scoring
-	* Aggregate scoring on the server
-		* Storage mechanism per level, per team, per effort
-		* Level changing mechanics
-			* Clearing state on mobile and clearing histogram
-		* Replay on histogram
-	* Check against proper answers
-		* Stored in text file
-	
-### Admin [Sean]
-	* Better admin panel
-
-### Scoreboard [Ashwin + Timur]
-	* Kaleidoscope resizing
-	* Styling + Position (relative)
-		* For portrait AND landscape
-
-### Mobile [Jatin + Madina]
-	* Better buttons 
-	* Bigger text 
-	* Clear button 
-	* Wide text 
-	* Highlight selected dancer 
-	* Save state on mobile screen 
-		* Popup alert
-	* Clear on new level
-	* (low priority) Store answers per level in cookies 
-
+Nice to have:
+--------------
+- Fix effort buttons greying out
+- Bottom padding for submit/clear buttons (and in between?)
+- Let client repick his team
 
 
 

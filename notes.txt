@@ -1,9 +1,0 @@
-Put level on scoreboard
-
-End of level display correct answers (mobile and scoreboard)
-
-Kaleidescope Animation
-
-Better admin - Clear all scores in the game, save them to file as well, only
-specify level
-
