@@ -10,7 +10,7 @@ sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
 
 TODO:
 -----
-1. End of level display correct answers (mobile and scoreboard)
+1. End of level display correct answers (mobile and scoreboard)  
 ~~2. Put level on scoreboard~~
 3. Clean up mobile UI on smaller screens
 4. Let user re-pick his team (or reduce cookie expiration to a few minutes)
