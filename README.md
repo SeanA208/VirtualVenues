@@ -19,8 +19,9 @@ TODO:
 4. ~~Reduce cookie expiration to a few minutes~~ **changed to 2.5 minutes**
 5. ~~Kaleidoscope Animation~~
 6. Better admin 
-  1. Clear all scores in the game, save them to file as well
+  1. ~~Clear all scores in the game~~ save them to file as well - **not sure about this**
   2. Only specify level (preset configurations)
+  3. ~~Game over signal~~
 
 Nice to have:
 --------------
