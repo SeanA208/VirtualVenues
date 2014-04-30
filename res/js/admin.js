@@ -37,27 +37,12 @@ $(document).ready(function() {
 		//TODO(sean): Update active level display
 	});
 
-	var endGame = document.getElementById("endGame-button");
-	if (endGame == null) {
-		console.log("NULL");
-	}
-
 	$("#update-button").click(function(e) {
-
 		e.preventDefault();
 		//TODO(sean): Fix this, it's very hacky!! 
 		changeLevel($("#level-select").val().substring(6) - 1);
 	});
-
-	endGame.addEventListener('click', function() {
-		console.log('End Game');
-	}, false);
 });	
-
-function endGame() {
-	console.log("Admin Ended the Game");
-}
-
 
 function changeLevel(newLevel)	{
 	var newDancerNumber = 0;
