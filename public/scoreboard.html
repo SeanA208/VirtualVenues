@@ -34,14 +34,23 @@
 			background-color:#000000;
 			overflow:hidden
 		}
+		.modal, .modal.fade {
+            top: 30%;
+        }
 	</style>
 </head>
 
-<script type="text/javascript">
-
-</script>
-
 <body onload="resize()">
+	<!-- Modal -->
+	<div class="modal fade" id="finishModal" tabindex="-1" role="dialog" aria-labelledby="smallModal" aria-hidden="true" style="z-index:-1">
+	    <div class="modal-dialog modal-sm">
+	        <div class="modal-body" align="center">
+	            <h2 id="modal-alert" style="font: bold 30px sans-serif; color: white;"></h2>
+	        </div>
+	    </div>
+	</div>
+	<!-- End: Modal -->
+
 	<!-- Animation Element -->
 	<div id="screen" style="background-color:#000000; display:none;">
 		<canvas id="shadebob"></canvas>

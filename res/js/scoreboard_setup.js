@@ -351,10 +351,26 @@ $(document).ready(function() {
 		graph.update(EFFORT_SCORES);
 		ACTIVE_LEVEL = 0;
 		SCORES = {"illinois" : 0, "irvine" : 0};
+		$("#level").html("Level<br>" + 1);
 	});
 
 	socket.on(ServerMessage.GameOver, function() {
 		console.log("scoreboard: game over");
-		//TODO
+		var winner;
+		if (SCORES["illinois"] > SCORES["irvine"]) {
+    	    winner = "Illinois won!";
+		}
+		else if (SCORES["illinois"] < SCORES["irvine"]) {
+			winner = "Irvine won!";
+		}
+		else {
+			winner = "It's a draw!";
+		}
+		var winString = "Game over!<br><br>" + winner;
+		$("#level").html(winString);
+		$("#modal-alert").text(winString);
+		$("#finishModal").modal('show');
+
+		// setTimeout(function(){$('#alertModal').modal('hide')},1500);
 	});
 });	
