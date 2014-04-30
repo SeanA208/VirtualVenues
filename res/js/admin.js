@@ -55,6 +55,9 @@ $(document).ready(function() {
 		e.preventDefault();
 		console.log("resetting scores");
 		socket.emit(AdminClientMessage.ResetScores);
+		ACTIVE_LEVEL = 0;
+		SCORES = {"illinois" : 0, "irvine" : 0};
+		EFFORT_SCORES = [0, 0, 0, 0, 0, 0, 0, 0];
 		//TODO: Save scores?
 	});
 

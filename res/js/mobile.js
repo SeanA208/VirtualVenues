@@ -31,7 +31,8 @@ var LEVEL_SETTING = null;
 // Message Type Definitions (copy from server.js)
 var ServerMessage = {
   LevelSetting : "levelsetting",
-  Quiz : "quiz"
+  Quiz : "quiz",
+  ResetScores : "resetscores"
 };
 
 var ClientMessage = {
@@ -41,6 +42,12 @@ var ClientMessage = {
 /* 
     Handlers
 */
+socket.on(ServerMessage.ResetScores, function (data) {
+    console.log("client: reset")
+    previousAnswer = null;
+    currLevel = 0;
+});
+
 socket.on(ServerMessage.LevelSetting, function (data) {
     LEVEL_SETTING = data;
     numDancers = LEVEL_SETTING.TotalDancers;
@@ -140,13 +147,12 @@ function loadDancerButtons() {
     });
 };
 
-function showAlert(text, time){
+function showAlert(text, time) {
     var obj = $("#modal-alert").text(text);
     obj.html(obj.html().replace(/\n/g,'<br/>'));
     $('#alertModal').modal('show');
     console.log("Calling from mobile.js");
     setTimeout(function(){$('#alertModal').modal('hide')},time);
-
 };
 
 $(document).ready(function() {

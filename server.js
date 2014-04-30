@@ -364,7 +364,45 @@ io.sockets.on('connection', function (socket) {
 
   socket.on(AdminClientMessage.ResetScores, function(data) {
     console.log("server: admin telling to reset scores");
-    sendMessageToScoreClients(ServerMessage.ResetScores, null);
+    SCORES = {"illinois" : 0, "irvine" : 0};
+    ACTIVE_LEVEL = 0;
+    LEVEL_SETTING = {
+      "TotalDancers" : 2,
+      "EffortsPerDancer" : 1,
+      "DancerEfforts" : { 
+        '1' : [0], 
+        '2' : [2]
+      }
+    };
+
+    all_scores = {
+      "illinois" : 
+        // Per level
+        [
+          // Histogram per dancer
+          [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ], // Level 1, Dancers 1 and 2
+          [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ], // Level 2, Dancers 1, 2, 3, 4
+          [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ], // Level 3, Dancers 1, 2
+          [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ] // Level 4, Dancers 1, 2, 3, 4
+        ],
+
+      "irvine" : 
+        // Per level
+        [
+          // Histogram per dancer
+          [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ], // Level 1, Dancers 1 and 2
+          [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ], // Level 2, Dancers 1, 2, 3, 4
+          [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ], // Level 3, Dancers 1, 2
+          [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ] // Level 4, Dancers 1, 2, 3, 4
+        ],
+    }
+    io.sockets.emit(ServerMessage.ResetScores);
+
+    io.sockets.emit(ServerMessage.LevelSetting, {
+      "Level" : ACTIVE_LEVEL,
+      "TotalDancers" : LEVEL_SETTING.TotalDancers,
+      "EffortsPerDancer" : LEVEL_SETTING.EffortsPerDancer
+    });
   });
 
   socket.on(AdminClientMessage.GameOver, function(data) {
